@@ -6,6 +6,7 @@ public class Asset {
     private Double currencyValue;
     private String currency;
     private Double euroValue;
+    private boolean showAsset = true;
 
     public Asset(Double currencyValue, String currency, Double euroValue) {
         this.currencyValue = currencyValue;
@@ -34,6 +35,18 @@ public class Asset {
 
     Double getEuroValue() {
         return euroValue;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public boolean isShowAsset() {
+        return showAsset;
+    }
+
+    public void setShowAsset(boolean showAsset) {
+        this.showAsset = showAsset;
     }
 
     @Override

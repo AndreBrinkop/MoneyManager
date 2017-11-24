@@ -1,6 +1,8 @@
 package asset_checker;
 
 import asset_checker.abstract_checker.HBCIAssetChecker;
+import model.ApiException;
+import model.AssetList;
 
 public class SparkasseHannoverAssetChecker extends HBCIAssetChecker {
 
@@ -20,5 +22,15 @@ public class SparkasseHannoverAssetChecker extends HBCIAssetChecker {
         return passport;
     }
 
+    @Override
+    public AssetList retrieveAssets() throws ApiException {
+        AssetList assetList = super.retrieveAssets();
+        assetList.forEach(asset -> {
+            if (asset.getDescription().contains("BonusSparen")) {
+                asset.setShowAsset(false);
+            }
+        });
+        return assetList;
+    }
 }
 

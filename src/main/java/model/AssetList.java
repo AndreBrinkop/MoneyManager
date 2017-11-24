@@ -15,7 +15,7 @@ public class AssetList extends LinkedList<Asset> {
     }
 
     public Double getTotalEurValue() {
-        return Asset.roundValue(this.stream().mapToDouble(Asset::getEuroValue).sum());
+        return Asset.roundValue(this.stream().filter(Asset::isShowAsset).mapToDouble(Asset::getEuroValue).sum());
     }
 
     @Override
@@ -23,7 +23,7 @@ public class AssetList extends LinkedList<Asset> {
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append(assetLocation).append(" - ").append(getTotalEurValue()).append(" €").append(this.isEmpty() ? "\n" : ":\n");
 
-        this.forEach(asset -> stringBuffer.append("\t").append(asset.toString()).append("\n"));
+        this.stream().filter(Asset::isShowAsset).forEach(asset -> stringBuffer.append("\t").append(asset.toString()).append("\n"));
 
         return stringBuffer.toString();
     }
