@@ -61,6 +61,7 @@ public class MoneyManager {
         assetChecker.add(new INGDiBaAssetChecker(properties.getProperty("ingDiBa.username"), properties.getProperty("ingDiBa.password")));
         assetChecker.add(new AuxmoneyAssetChecker(properties.getProperty("auxmoney.username"), properties.getProperty("auxmoney.password")));
         assetChecker.add(new EquatePlusAssetChecker(properties.getProperty("equate.username"), properties.getProperty("equate.password")));
+        assetChecker.add(new BitcoinDeAssetChecker(properties.getProperty("bitcoinDe.username"), properties.getProperty("bitcoinDe.password")));
         assetChecker.add(new KrakenAssetChecker(properties.getProperty("kraken.apikey"), properties.getProperty("kraken.apisecret")));
         assetChecker.add(new PayPalAssetChecker(properties.getProperty("payPal.apiUser"), properties.getProperty("payPal.apiKey"), properties.getProperty("payPal.apiSignature")));
         assetChecker.add(new AmazonVisaAssetChecker(properties.getProperty("amazonVisa.username"), properties.getProperty("amazonVisa.password")));
