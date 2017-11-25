@@ -26,7 +26,7 @@ public class SparkasseHannoverAssetChecker extends HBCIAssetChecker {
     public AssetList retrieveAssets() throws ApiException {
         AssetList assetList = super.retrieveAssets();
         assetList.forEach(asset -> {
-            if (asset.getDescription().contains("BonusSparen")) {
+            if (asset.getDescription().contains("BonusSparen") || asset.getDescription().contains("KlassikSparen")) {
                 asset.setShowAsset(false);
             }
         });
