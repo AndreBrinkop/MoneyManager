@@ -4,6 +4,8 @@ import util.NumberHelper;
 
 import java.util.List;
 
+import static util.NumberHelper.roundValue;
+
 public class Depot extends Account {
 
     private List<DepotPosition> depotPositions;
@@ -18,10 +20,35 @@ public class Depot extends Account {
         return NumberHelper.roundValue(this.depotPositions.stream().mapToDouble(DepotPosition::getEuroValue).sum());
     }
 
+    public Double getTotalWinLoss() {
+        if (this.depotPositions.stream().filter(depotPosition -> depotPosition.getBuyValue() == null).findAny().isPresent()) {
+            return null;
+        }
+        return this.depotPositions.stream().mapToDouble(DepotPosition::getTotalWinLoss).sum();
+    }
+
+    public Double getTotalWinLossPercentage() {
+        if (this.depotPositions.stream().filter(depotPosition -> depotPosition.getBuyValue() == null).findAny().isPresent()) {
+            return null;
+        }
+        Double totalValue = getTotalEurValue();
+        Double totalBuyValue = totalValue - getTotalWinLoss();
+        return (totalValue / totalBuyValue - 1) * 100;
+    }
+
     @Override
     public String toString() {
         StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append(name).append(": ").append(getTotalEurValue()).append(" €").append("\n");
+        stringBuffer.append(name + ": " + roundValue(getTotalWinLoss()) + " €");
+        Double winLossPercentage = roundValue(getTotalWinLossPercentage());
+        if (winLossPercentage != null) {
+            stringBuffer.append(" (")
+                    .append(winLossPercentage > 0.0d ? "+" : "")
+                    .append(winLossPercentage + " %, ")
+                    .append(winLossPercentage > 0.0d ? "+" : "")
+                    .append(roundValue(getTotalWinLoss()) + " €)");
+        }
+        stringBuffer.append("\n");
 
         if (this.depotPositions.isEmpty()) {
             return stringBuffer.toString();
@@ -31,5 +58,6 @@ public class Depot extends Account {
 
         return stringBuffer.substring(0, stringBuffer.length() - 1);
     }
+
 
 }

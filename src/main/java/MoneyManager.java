@@ -10,6 +10,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
+import static util.NumberHelper.roundValue;
+
 public class MoneyManager {
 
     public static void main(String[] args) throws Exception {
@@ -87,7 +89,7 @@ public class MoneyManager {
             System.out.println(assetSource);
         }
 
-        Double totalAmount = assetSourceList.stream().mapToDouble(AssetSource::getTotalEurValue).sum();
+        Double totalAmount = roundValue(assetSourceList.stream().mapToDouble(AssetSource::getTotalEurValue).sum());
         System.out.println("--------------------");
         System.out.println("Total: " + totalAmount + " €");
     }

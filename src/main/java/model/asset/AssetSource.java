@@ -3,6 +3,8 @@ package model.asset;
 import java.util.LinkedList;
 import java.util.List;
 
+import static util.NumberHelper.roundValue;
+
 public class AssetSource {
 
     private String name;
@@ -37,7 +39,7 @@ public class AssetSource {
     @Override
     public String toString() {
         StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append(name).append(": ").append(getTotalEurValue()).append(" €\n");
+        stringBuffer.append(name).append(": ").append(roundValue(getTotalEurValue())).append(" €\n");
         this.accounts.stream().forEach(account -> stringBuffer.append("\t").append(account.toString()).append("\n"));
         return stringBuffer.toString();
     }
