@@ -4,6 +4,9 @@ import model.ApiException;
 import model.AssetChecker;
 import model.asset.Account;
 import model.asset.BasicAccount;
+import model.asset.Depot;
+import model.asset.DepotPosition;
+import org.apache.commons.lang.WordUtils;
 import org.kapott.hbci.GV.HBCIJob;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
 import org.kapott.hbci.GV_Result.GVRWPDepotList;
@@ -14,7 +17,6 @@ import org.kapott.hbci.manager.HBCIUtils;
 import org.kapott.hbci.passport.HBCIPassport;
 import org.kapott.hbci.passport.HBCIPassportPinTan;
 import org.kapott.hbci.status.HBCIExecStatus;
-import org.kapott.hbci.structures.BigDecimalValue;
 import org.kapott.hbci.structures.Konto;
 
 import java.io.ByteArrayOutputStream;
@@ -91,8 +93,8 @@ public abstract class HBCIAssetChecker extends AssetChecker {
                 // System.out.println("konto = " + konto);
                 if (konto.type.contains("Depot")) {
                     String depotDescription = konto.type + " " + konto.number;
-                    Double depotValue = getDepotValue(passport, hbciHandle, konto).getValue().doubleValue();
-                    Account depot = new BasicAccount(depotDescription, depotValue); // TODO
+                    List<DepotPosition> depotPositions = getDepotValue(passport, hbciHandle, konto);
+                    Account depot = new Depot(depotDescription, depotPositions);
                     assetList.add(depot);
                 } else {
                     String accountDescription = konto.type + " " + konto.number;
@@ -114,7 +116,7 @@ public abstract class HBCIAssetChecker extends AssetChecker {
         return assetList;
     }
 
-    private BigDecimalValue getDepotValue(HBCIPassport hbciPassport, HBCIHandler hbciHandle, Konto depot) throws ApiException {
+    private List<DepotPosition> getDepotValue(HBCIPassport hbciPassport, HBCIHandler hbciHandle, Konto depot) throws ApiException {
         HBCIJob depotAssetsJob = hbciHandle.newJob("WPDepotList");
         depotAssetsJob.setParam("my", depot);
         depotAssetsJob.addToQueue();
@@ -124,9 +126,9 @@ public abstract class HBCIAssetChecker extends AssetChecker {
         GVRWPDepotList result = (GVRWPDepotList) depotAssetsJob.getJobResult();
 
         if (result.isOK() && result.getEntries().length == 1) {
-            //System.out.println(result.toString());
-            return result.getEntries()[0].total;
-
+            // System.out.println(result.toString());
+            // Total: result.getEntries()[0].total
+            return createDepotPositions(result.getEntries()[0].getEntries());
         } else {
             String error = "";
             if (result.getJobStatus().getErrorString() != null && !result.getJobStatus().getErrorString().isEmpty()) {
@@ -136,6 +138,19 @@ public abstract class HBCIAssetChecker extends AssetChecker {
             }
             throw new ApiException("Could not retrieve Depot value. " + error);
         }
+    }
+
+    private List<DepotPosition> createDepotPositions(GVRWPDepotList.Entry.Gattung[] entries) {
+        List<DepotPosition> depotPositions = new LinkedList<>();
+        for (GVRWPDepotList.Entry.Gattung entry : entries) {
+            depotPositions.add(new DepotPosition(formatName(entry.name), entry.isin, entry.wkn, entry.saldo.getValue(), entry.price.getValue(), entry.einstandspreis.getValue()));
+        }
+        return depotPositions;
+    }
+
+    private String formatName(String name) {
+        name = name.replaceAll("\\s+", " ");
+        return WordUtils.capitalizeFully(name, new char[]{' ', '.', '-', ',', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'});
     }
 
     private Double getAccountValue(HBCIPassport hbciPassport, HBCIHandler hbciHandle, Konto account) throws ApiException {

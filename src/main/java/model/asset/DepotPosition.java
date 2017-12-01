@@ -1,23 +1,39 @@
 package model.asset;
 
+import java.math.BigDecimal;
+
 public class DepotPosition {
 
     private String name;
-    private Double amount;
-    private Double euroValue;
+    private String isin;
+    private String wkn;
 
-    public DepotPosition(String name, Double amount, Double euroValue) {
+    private Double amount;
+    private Double pricePerUnit;
+    private Double buyValue;
+
+    public DepotPosition(String name, String isin, String wkn, BigDecimal amount, BigDecimal pricePerUnit, BigDecimal buyValue) {
+        this.name = name;
+        this.isin = isin;
+        this.wkn = wkn;
+        this.amount = amount.doubleValue();
+        this.pricePerUnit = pricePerUnit.doubleValue();
+        this.buyValue = buyValue.doubleValue();
+    }
+
+    public DepotPosition(String name, Double amount, Double pricePerUnit) {
         this.name = name;
         this.amount = amount;
-        this.euroValue = euroValue;
+        this.pricePerUnit = pricePerUnit;
+        this.buyValue = buyValue;
     }
 
     public Double getEuroValue() {
-        return euroValue;
+        return amount * pricePerUnit;
     }
 
     @Override
     public String toString() {
-        return amount + " " + name + ": " + euroValue + " €";
+        return amount + " " + name + ": " + getEuroValue() + " €";
     }
 }

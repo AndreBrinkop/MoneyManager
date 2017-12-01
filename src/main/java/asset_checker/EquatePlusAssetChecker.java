@@ -68,8 +68,7 @@ public class EquatePlusAssetChecker extends HTTPAssetChecker {
                         Double calculatedValue = totalValue / amount;
                         stockDescription = sharePrices.entrySet().stream().filter(v -> Objects.equals(v.getValue(), calculatedValue)).findAny().get().getKey();
                     }
-
-                    accountList.add(new Depot("Depot", asList(new DepotPosition(stockDescription, amount, totalValue))));
+                    accountList.add(new Depot("Depot", asList(new DepotPosition(stockDescription, amount, totalValue / amount))));
                 }
             });
         });

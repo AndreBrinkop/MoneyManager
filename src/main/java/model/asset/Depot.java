@@ -27,7 +27,7 @@ public class Depot extends Account {
             return stringBuffer.toString();
         }
 
-        this.depotPositions.stream().forEach(position -> stringBuffer.append("\t\t").append(position.toString()));
+        this.depotPositions.stream().forEach(position -> stringBuffer.append("\t\t").append(position).append("\n"));
 
         return stringBuffer.substring(0, stringBuffer.length() - 1);
     }
