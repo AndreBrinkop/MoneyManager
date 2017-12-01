@@ -1,30 +1,36 @@
 package asset_checker;
 
 import model.ApiException;
-import model.Asset;
 import model.AssetChecker;
-import model.AssetList;
+import model.asset.Account;
+import model.asset.BasicAccount;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
-public class OfflineAssetChecker implements AssetChecker {
+public class OfflineAssetChecker extends AssetChecker {
 
-    private AssetList assetList;
+    private List<Account> accountList;
     private String name;
 
-    public OfflineAssetChecker(String name, Asset... assets) {
-        this.assetList = new AssetList(name);
+    public OfflineAssetChecker(String name, Account... accounts) {
         this.name = name;
-        this.assetList.addAll(Arrays.asList(assets));
+        this.accountList = new LinkedList<>();
+        this.accountList.addAll(Arrays.asList(accounts));
     }
 
-    @Override
+    public OfflineAssetChecker(String name, Double euroValue) {
+        this.name = name;
+        this.accountList = new LinkedList<>();
+        this.accountList.add(new BasicAccount(name, euroValue));
+    }
+
     public String getName() {
         return name;
     }
 
-    @Override
-    public AssetList retrieveAssets() throws ApiException {
-        return assetList;
+    public List<Account> retrieveAssets() throws ApiException {
+        return accountList;
     }
 }

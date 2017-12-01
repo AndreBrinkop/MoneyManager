@@ -2,8 +2,8 @@ package asset_checker;
 
 import asset_checker.abstract_checker.HTTPAssetChecker;
 import model.ApiException;
-import model.Asset;
-import model.AssetList;
+import model.asset.Account;
+import model.asset.BasicAccount;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Content;
 import org.apache.http.client.fluent.Request;
@@ -13,6 +13,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class AmazonVisaAssetChecker extends HTTPAssetChecker {
 
@@ -77,8 +80,8 @@ public class AmazonVisaAssetChecker extends HTTPAssetChecker {
     }
 
     @Override
-    protected AssetList retrieveAssetsWithActiveSession() throws ApiException {
-        AssetList assetList = new AssetList(getName());
+    protected List<Account> retrieveAssetsWithActiveSession() throws ApiException {
+        List<Account> accountList = new LinkedList<>();
 
         String lbbCosUrl = "https://kreditkarten-banking.lbb.de/lbb/cos_lbb/";
         String lbbPreLogonUrl = lbbCosUrl + "dispatch.do?bt_PRELOGON=-1";
@@ -104,7 +107,7 @@ public class AmazonVisaAssetChecker extends HTTPAssetChecker {
                     balanceString = balanceString.substring("EUR  ".length(), balanceString.length());
                     balanceString = balanceString.replaceAll(",", ".");
                     Double balance = Double.valueOf(balanceString);
-                    assetList.add(new Asset(balance));
+                    accountList.add(new BasicAccount(getName(), balance));
                 }
             }
 
@@ -112,6 +115,6 @@ public class AmazonVisaAssetChecker extends HTTPAssetChecker {
             throw new ApiException("Could not retrieve Assets.", e);
         }
 
-        return assetList;
+        return accountList;
     }
 }

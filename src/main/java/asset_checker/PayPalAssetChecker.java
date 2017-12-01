@@ -2,9 +2,9 @@ package asset_checker;
 
 import com.google.common.base.Splitter;
 import model.ApiException;
-import model.Asset;
 import model.AssetChecker;
-import model.AssetList;
+import model.asset.Account;
+import model.asset.BasicAccount;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
@@ -16,9 +16,11 @@ import org.apache.http.impl.client.HttpClients;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
-public class PayPalAssetChecker implements AssetChecker {
+public class PayPalAssetChecker extends AssetChecker {
 
     private String apiUser;
     private String apiKey;
@@ -36,7 +38,7 @@ public class PayPalAssetChecker implements AssetChecker {
     }
 
     @Override
-    public AssetList retrieveAssets() throws ApiException {
+    public List<Account> retrieveAssets() throws ApiException {
 
         HttpClient client = HttpClients.custom()
                 .setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build()).build();
@@ -60,8 +62,8 @@ public class PayPalAssetChecker implements AssetChecker {
         }
     }
 
-    private AssetList parseResponseValues(Map<String, String> responseValues) throws ApiException {
-        AssetList assetList = new AssetList(getName());
+    private List<Account> parseResponseValues(Map<String, String> responseValues) throws ApiException {
+        List<Account> accountList = new LinkedList<>();
         Map<String, Double> assetValues = new HashMap<>();
 
         if (responseValues.get("ACK") == null || !responseValues.get("ACK").equals("Success")) {
@@ -89,9 +91,9 @@ public class PayPalAssetChecker implements AssetChecker {
             // Other currencies are not implemented yet.
             throw new ApiException("Could not retrieve assets.");
         }
-        assetList.add(new Asset(assetValues.get(eur)));
+        accountList.add(new BasicAccount(getName(), assetValues.get(eur)));
 
-        return assetList;
+        return accountList;
     }
 
     private Map<String, String> splitToMap(String nvpString) {

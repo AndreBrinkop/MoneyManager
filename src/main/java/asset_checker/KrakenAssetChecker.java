@@ -2,17 +2,15 @@ package asset_checker;
 
 import edu.self.kraken.api.KrakenApi;
 import model.ApiException;
-import model.Asset;
 import model.AssetChecker;
-import model.AssetList;
+import model.asset.Account;
+import model.asset.CurrencyAccount;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-public class KrakenAssetChecker implements AssetChecker {
+public class KrakenAssetChecker extends AssetChecker {
 
     private KrakenApi api;
 
@@ -23,24 +21,23 @@ public class KrakenAssetChecker implements AssetChecker {
         this.api.setSecret(apiSecret);
     }
 
-    @Override
     public String getName() {
         return "kraken.com";
     }
 
-    public AssetList retrieveAssets() throws ApiException {
+    public List<Account> retrieveAssets() throws ApiException {
         Map<String, Double> assets = getAssetValues();
         Map<String, Double> conversionRates = getConversionRatesToEur(assets.keySet());
         return createAssetObjects(assets, conversionRates);
     }
 
-    private AssetList createAssetObjects(Map<String, Double> assets, Map<String, Double> conversionRates) throws ApiException {
-        AssetList assetObjects = new AssetList(getName());
+    private List<Account> createAssetObjects(Map<String, Double> assets, Map<String, Double> conversionRates) throws ApiException {
+        List<Account> accountList = new LinkedList<>();
         assets.forEach((String currency, Double value) -> {
             Double eurValue = getEurValue(currency, value, conversionRates);
-            assetObjects.add(new Asset(value, currency, eurValue));
+            accountList.add(new CurrencyAccount(getName(), currency, value, eurValue));
         });
-        return assetObjects;
+        return accountList;
     }
 
     private Double getEurValue(String currency, Double value, Map<String, Double> conversionRates) {

@@ -1,9 +1,9 @@
 package asset_checker.abstract_checker;
 
 import model.ApiException;
-import model.Asset;
 import model.AssetChecker;
-import model.AssetList;
+import model.asset.Account;
+import model.asset.BasicAccount;
 import org.kapott.hbci.GV.HBCIJob;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
 import org.kapott.hbci.GV_Result.GVRWPDepotList;
@@ -19,9 +19,11 @@ import org.kapott.hbci.structures.Konto;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 
-public abstract class HBCIAssetChecker implements AssetChecker {
+public abstract class HBCIAssetChecker extends AssetChecker {
 
     protected String user;
     protected String password;
@@ -31,7 +33,6 @@ public abstract class HBCIAssetChecker implements AssetChecker {
         this.password = password;
     }
 
-    @Override
     public abstract String getName();
 
     public abstract HBCIAssetCheckerPassport fillPassport(HBCIAssetCheckerPassport passport);
@@ -48,9 +49,8 @@ public abstract class HBCIAssetChecker implements AssetChecker {
         return passport;
     }
 
-    @Override
-    public AssetList retrieveAssets() throws ApiException {
-        AssetList assetList = new AssetList(getName());
+    public List<Account> retrieveAssets() throws ApiException {
+        List<Account> assetList = new LinkedList<>();
         HBCIPassport passport = null;
         HBCIHandler hbciHandle = null;
 
@@ -92,11 +92,12 @@ public abstract class HBCIAssetChecker implements AssetChecker {
                 if (konto.type.contains("Depot")) {
                     String depotDescription = konto.type + " " + konto.number;
                     Double depotValue = getDepotValue(passport, hbciHandle, konto).getValue().doubleValue();
-                    assetList.add(new Asset(depotValue, depotDescription));
+                    Account depot = new BasicAccount(depotDescription, depotValue); // TODO
+                    assetList.add(depot);
                 } else {
                     String accountDescription = konto.type + " " + konto.number;
                     Double accountValue = getAccountValue(passport, hbciHandle, konto);
-                    assetList.add(new Asset(accountValue, accountDescription));
+                    assetList.add(new BasicAccount(accountDescription, accountValue));
                 }
             }
 

@@ -2,15 +2,17 @@ package asset_checker.abstract_checker;
 
 import model.ApiException;
 import model.AssetChecker;
-import model.AssetList;
+import model.asset.Account;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.fluent.Executor;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.HttpClientBuilder;
 
+import java.util.List;
 
-public abstract class HTTPAssetChecker implements AssetChecker {
+
+public abstract class HTTPAssetChecker extends AssetChecker {
 
     protected String user;
     protected String password;
@@ -30,14 +32,13 @@ public abstract class HTTPAssetChecker implements AssetChecker {
 
     protected abstract void logout() throws ApiException;
 
-    protected abstract AssetList retrieveAssetsWithActiveSession() throws ApiException;
+    protected abstract List<Account> retrieveAssetsWithActiveSession() throws ApiException;
 
-    @Override
-    public AssetList retrieveAssets() throws ApiException {
+    public List<Account> retrieveAssets() throws ApiException {
         login();
-        AssetList assets = retrieveAssetsWithActiveSession();
+        List<Account> accounts = retrieveAssetsWithActiveSession();
         logout();
-        return assets;
+        return accounts;
     }
 
     private static Executor getExecutor() {

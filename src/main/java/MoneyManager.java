@@ -1,8 +1,8 @@
 import asset_checker.*;
 import model.ApiException;
-import model.Asset;
 import model.AssetChecker;
-import model.AssetList;
+import model.asset.Account;
+import model.asset.AssetSource;
 import util.EncryptedProperties;
 
 import java.io.*;
@@ -65,16 +65,14 @@ public class MoneyManager {
         assetChecker.add(new KrakenAssetChecker(properties.getProperty("kraken.apikey"), properties.getProperty("kraken.apisecret")));
         assetChecker.add(new PayPalAssetChecker(properties.getProperty("payPal.apiUser"), properties.getProperty("payPal.apiKey"), properties.getProperty("payPal.apiSignature")));
         assetChecker.add(new AmazonVisaAssetChecker(properties.getProperty("amazonVisa.username"), properties.getProperty("amazonVisa.password")));
-        assetChecker.add(new OfflineAssetChecker("Tesla", new Asset(1000.0, "Model 3 Reservation")));
+        assetChecker.add(new OfflineAssetChecker("Tesla Model 3 Reservation", 1000.0));
 
-        List<AssetList> assetLists = new LinkedList<>();
+        List<AssetSource> assetSourceList = new LinkedList<>();
 
         for (AssetChecker checker : assetChecker) {
             System.out.println("Retrieving assets from: " + checker.getName());
-            AssetList assetList = null;
             try {
-                assetList = checker.retrieveAssets();
-                assetLists.add(assetList);
+                assetSourceList.add(checker.retrieveAssetss());
             } catch (ApiException e) {
                 e.printStackTrace();
             }
@@ -82,13 +80,26 @@ public class MoneyManager {
 
         System.out.println();
 
-        for (AssetList assetList : assetLists) {
-            System.out.println(assetList);
+        filterOutAssetSources(assetSourceList, "KlassikSparen");
+        filterOutAssetSources(assetSourceList, "BonusSparen");
+
+        for (AssetSource assetSource : assetSourceList) {
+            System.out.println(assetSource);
         }
 
-        Double totalAmount = assetLists.stream().mapToDouble(AssetList::getTotalEurValue).sum();
+        Double totalAmount = assetSourceList.stream().mapToDouble(AssetSource::getTotalEurValue).sum();
         System.out.println("--------------------");
         System.out.println("Total: " + totalAmount + " €");
+    }
+
+    private void filterOutAssetSources(List<AssetSource> assetSourceList, String accountNamePart) {
+        for (AssetSource assetSource : assetSourceList) {
+            for (Account account : assetSource.getAccounts()) {
+                if (account.getName().contains(accountNamePart)) {
+                    assetSource.removeAccount(account);
+                }
+            }
+        }
     }
 
 }

@@ -2,8 +2,8 @@ package asset_checker;
 
 import asset_checker.abstract_checker.HTTPAssetChecker;
 import model.ApiException;
-import model.Asset;
-import model.AssetList;
+import model.asset.Account;
+import model.asset.CurrencyAccount;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Content;
 import org.apache.http.client.fluent.Request;
@@ -14,6 +14,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -117,8 +119,8 @@ public class BitcoinDeAssetChecker extends HTTPAssetChecker {
     }
 
     @Override
-    protected AssetList retrieveAssetsWithActiveSession() throws ApiException {
-        AssetList assetList = new AssetList(getName());
+    protected List<Account> retrieveAssetsWithActiveSession() throws ApiException {
+        List<Account> accountList = new LinkedList<>();
         String bitcoinDeDashboardUrl = "https://www.bitcoin.de/de/dashboard";
         Response response;
         try {
@@ -145,7 +147,7 @@ public class BitcoinDeAssetChecker extends HTTPAssetChecker {
             for (Element tableRow : assetTableRows) {
                 Elements columnStrongElements = tableRow.getElementsByTag("strong");
                 String currencyAmountString = columnStrongElements.get(1).text().trim();
-                String currency = currencyAmountString.substring(currencyAmountString.indexOf(" "));
+                String currency = currencyAmountString.substring(currencyAmountString.indexOf(" ") + 1);
                 String amountString = currencyAmountString.substring(0, currencyAmountString.indexOf(" "));
                 String euroValueString = columnStrongElements.get(2).text();
 
@@ -161,7 +163,7 @@ public class BitcoinDeAssetChecker extends HTTPAssetChecker {
                     double amount = Double.valueOf(amountString);
                     double euroValue = Double.valueOf(euroValueString);
                     if (amount > 0.0) {
-                        assetList.add(new Asset(amount, currency, euroValue));
+                        accountList.add(new CurrencyAccount(getName(), currency, amount, euroValue));
                     }
                 }
             }
@@ -170,7 +172,7 @@ public class BitcoinDeAssetChecker extends HTTPAssetChecker {
             throw new ApiException("Could not retrieve assets.", e);
         }
 
-        return assetList;
+        return accountList;
     }
 
 }

@@ -2,8 +2,8 @@ package asset_checker;
 
 import asset_checker.abstract_checker.HTTPAssetChecker;
 import model.ApiException;
-import model.Asset;
-import model.AssetList;
+import model.asset.Account;
+import model.asset.BasicAccount;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
@@ -13,6 +13,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -28,11 +30,11 @@ public class AuxmoneyAssetChecker extends HTTPAssetChecker {
     }
 
     @Override
-    protected AssetList retrieveAssetsWithActiveSession() throws ApiException {
-        AssetList assets = new AssetList(getName());
-        assets.add(new Asset(retrieveInvestmentAccountBalance(), "Angebotskonto"));
-        assets.add(new Asset(retrieveFixedCapitalBalance(), "Gebundenes Kapital"));
-        return assets;
+    protected List<Account> retrieveAssetsWithActiveSession() throws ApiException {
+        List<Account> accountList = new LinkedList<>();
+        accountList.add(new BasicAccount("Angebotskonto", retrieveInvestmentAccountBalance()));
+        accountList.add(new BasicAccount("Gebundenes Kapital", retrieveFixedCapitalBalance()));
+        return accountList;
     }
 
     private Double retrieveFixedCapitalBalance() throws ApiException {

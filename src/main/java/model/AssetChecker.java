@@ -1,9 +1,18 @@
 package model;
 
-public interface AssetChecker {
+import model.asset.Account;
+import model.asset.AssetSource;
 
-    String getName();
+import java.util.List;
 
-    AssetList retrieveAssets() throws ApiException;
+public abstract class AssetChecker {
+
+    public abstract String getName();
+
+    protected abstract List<Account> retrieveAssets() throws ApiException;
+
+    public AssetSource retrieveAssetss() throws ApiException {
+        return new AssetSource(getName(), retrieveAssets());
+    }
 
 }

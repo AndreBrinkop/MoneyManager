@@ -2,8 +2,9 @@ package asset_checker;
 
 import asset_checker.abstract_checker.HTTPAssetChecker;
 import model.ApiException;
-import model.Asset;
-import model.AssetList;
+import model.asset.Account;
+import model.asset.Depot;
+import model.asset.DepotPosition;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Content;
 import org.apache.http.client.fluent.Request;
@@ -13,9 +14,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+
+import static java.util.Arrays.asList;
 
 public class EquatePlusAssetChecker extends HTTPAssetChecker {
 
@@ -30,19 +31,19 @@ public class EquatePlusAssetChecker extends HTTPAssetChecker {
     }
 
     @Override
-    public AssetList retrieveAssetsWithActiveSession() throws ApiException {
-        AssetList assets;
+    public List<Account> retrieveAssetsWithActiveSession() throws ApiException {
+        List<Account> accounts;
         try {
             Map<String, Double> sharePrices = retrieveSharePrices();
-            assets = retrieveAssets(sharePrices);
+            accounts = retrieveAssets(sharePrices);
         } catch (Exception e) {
             throw new ApiException("Could not retrieve assets.", e);
         }
-        return assets;
+        return accounts;
     }
 
-    private AssetList retrieveAssets(Map<String, Double> sharePrices) throws IOException {
-        AssetList assets = new AssetList(getName());
+    private List<Account> retrieveAssets(Map<String, Double> sharePrices) throws IOException {
+        List<Account> accountList = new LinkedList<>();
         String planSummaryUrl = "https://www.equateplus.com/EquatePlusParticipant2/services/planSummary/get";
 
         Response response = executor.execute(Request.Get(planSummaryUrl));
@@ -68,11 +69,11 @@ public class EquatePlusAssetChecker extends HTTPAssetChecker {
                         stockDescription = sharePrices.entrySet().stream().filter(v -> Objects.equals(v.getValue(), calculatedValue)).findAny().get().getKey();
                     }
 
-                    assets.add(new Asset(amount, "Aktien: " + stockDescription, totalValue));
+                    accountList.add(new Depot("Depot", asList(new DepotPosition(stockDescription, amount, totalValue))));
                 }
             });
         });
-        return assets;
+        return accountList;
     }
 
     private Map<String, Double> retrieveSharePrices() throws IOException, ApiException {
