@@ -27,6 +27,7 @@ public class PayPalAssetChecker extends AssetChecker {
     private String apiSignature;
 
     public PayPalAssetChecker(String apiUser, String apiKey, String apiSignature) {
+        super();
         this.apiUser = apiUser;
         this.apiKey = apiKey;
         this.apiSignature = apiSignature;

@@ -30,7 +30,7 @@ public class CurrencyAccount extends Account {
 
     @Override
     public String toString() {
-        return currencyValue + " " + currency + ": " + roundValue(euroValue) + " €";
+        return name + ": " + currencyValue + " " + currency + ": " + roundValue(euroValue) + " €";
     }
 
 

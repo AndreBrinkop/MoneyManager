@@ -39,7 +39,7 @@ public class Depot extends Account {
     @Override
     public String toString() {
         StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append(name + ": " + roundValue(getTotalWinLoss()) + " €");
+        stringBuffer.append(name + ": " + roundValue(getTotalEurValue()) + " €");
         Double winLossPercentage = roundValue(getTotalWinLossPercentage());
         if (winLossPercentage != null) {
             stringBuffer.append(" (")
