@@ -9,10 +9,10 @@ public abstract class AssetChecker {
 
     public abstract String getName();
 
-    protected abstract List<Account> retrieveAssets() throws ApiException;
+    protected abstract List<Account> retrieveAccounts() throws ApiException;
 
-    public AssetSource retrieveAssetss() throws ApiException {
-        return new AssetSource(getName(), retrieveAssets());
+    public AssetSource retrieveAssets() throws ApiException {
+        return new AssetSource(getName(), retrieveAccounts());
     }
 
 }

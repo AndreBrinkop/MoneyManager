@@ -25,7 +25,7 @@ public class KrakenAssetChecker extends AssetChecker {
         return "kraken.com";
     }
 
-    public List<Account> retrieveAssets() throws ApiException {
+    public List<Account> retrieveAccounts() throws ApiException {
         Map<String, Double> assets = getAssetValues();
         Map<String, Double> conversionRates = getConversionRatesToEur(assets.keySet());
         return createAssetObjects(assets, conversionRates);

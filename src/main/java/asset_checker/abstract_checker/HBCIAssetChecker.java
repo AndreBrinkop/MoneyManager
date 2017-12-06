@@ -51,7 +51,7 @@ public abstract class HBCIAssetChecker extends AssetChecker {
         return passport;
     }
 
-    public List<Account> retrieveAssets() throws ApiException {
+    public List<Account> retrieveAccounts() throws ApiException {
         List<Account> assetList = new LinkedList<>();
         HBCIPassport passport = null;
         HBCIHandler hbciHandle = null;

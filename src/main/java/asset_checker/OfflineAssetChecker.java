@@ -30,7 +30,7 @@ public class OfflineAssetChecker extends AssetChecker {
         return name;
     }
 
-    public List<Account> retrieveAssets() throws ApiException {
+    public List<Account> retrieveAccounts() throws ApiException {
         return accountList;
     }
 }

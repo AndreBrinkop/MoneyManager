@@ -34,7 +34,7 @@ public abstract class HTTPAssetChecker extends AssetChecker {
 
     protected abstract List<Account> retrieveAssetsWithActiveSession() throws ApiException;
 
-    public List<Account> retrieveAssets() throws ApiException {
+    public List<Account> retrieveAccounts() throws ApiException {
         login();
         List<Account> accounts = retrieveAssetsWithActiveSession();
         logout();

@@ -39,7 +39,7 @@ public class PayPalAssetChecker extends AssetChecker {
     }
 
     @Override
-    public List<Account> retrieveAssets() throws ApiException {
+    public List<Account> retrieveAccounts() throws ApiException {
 
         HttpClient client = HttpClients.custom()
                 .setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build()).build();

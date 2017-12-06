@@ -85,7 +85,7 @@ public class MoneyManager {
         for (AssetChecker checker : assetChecker) {
             System.out.println("Retrieving assets from: " + checker.getName());
             try {
-                assetSourceList.add(checker.retrieveAssetss());
+                assetSourceList.add(checker.retrieveAssets());
             } catch (ApiException e) {
                 e.printStackTrace();
             }
