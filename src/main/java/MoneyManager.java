@@ -41,7 +41,17 @@ public class MoneyManager {
         // properties.store(new FileOutputStream("properties.encrypted"), null);
 
         MoneyManager moneyManager = new MoneyManager();
-        moneyManager.retrieveAssets(properties);
+        Double oldTotalAmount = Double.valueOf(properties.getProperty("totalAmount", "0.0d"));
+        Double totalAmount = moneyManager.retrieveAssets(properties);
+        Double delta = roundValue(totalAmount - oldTotalAmount);
+
+        System.out.println("--------------------");
+        System.out.println("Old Total: " + oldTotalAmount + " €");
+        System.out.println("New Total: " + totalAmount + " €");
+        System.out.println("\t\t\t" + (delta > 0.0 ? "+" : "") + delta + " €");
+
+        properties.put("totalAmount", totalAmount.toString());
+        properties.store(new FileOutputStream("properties.encrypted"), null);
     }
 
     public static String getEncryptionKey() throws IOException {
@@ -56,7 +66,7 @@ public class MoneyManager {
         return encryptionKey;
     }
 
-    private void retrieveAssets(Properties properties) throws IOException {
+    private Double retrieveAssets(Properties properties) throws IOException {
         List<AssetChecker> assetChecker = new LinkedList<>();
 
         assetChecker.add(new SparkasseHannoverAssetChecker(properties.getProperty("sparkasseHannover.username"), properties.getProperty("sparkasseHannover.password")));
@@ -67,6 +77,7 @@ public class MoneyManager {
         assetChecker.add(new KrakenAssetChecker(properties.getProperty("kraken.apikey"), properties.getProperty("kraken.apisecret")));
         assetChecker.add(new PayPalAssetChecker(properties.getProperty("payPal.apiUser"), properties.getProperty("payPal.apiKey"), properties.getProperty("payPal.apiSignature")));
         assetChecker.add(new AmazonVisaAssetChecker(properties.getProperty("amazonVisa.username"), properties.getProperty("amazonVisa.password")));
+        assetChecker.add(new CoinbaseAssetChecker(properties.getProperty("coinbase.apikey"), properties.getProperty("coinbase.apisecret")));
         assetChecker.add(new OfflineAssetChecker("Tesla Model 3 Reservation", 1000.0));
 
         List<AssetSource> assetSourceList = new LinkedList<>();
@@ -90,12 +101,14 @@ public class MoneyManager {
         }
 
         Double totalAmount = roundValue(assetSourceList.stream().mapToDouble(AssetSource::getTotalEurValue).sum());
-        System.out.println("--------------------");
-        System.out.println("Total: " + totalAmount + " €");
+        return totalAmount;
     }
 
     private void filterOutAssetSources(List<AssetSource> assetSourceList, String accountNamePart) {
         for (AssetSource assetSource : assetSourceList) {
+            if (assetSource == null || assetSource.getAccounts() == null) {
+                continue;
+            }
             for (Account account : assetSource.getAccounts()) {
                 if (account.getName().contains(accountNamePart)) {
                     assetSource.removeAccount(account);
