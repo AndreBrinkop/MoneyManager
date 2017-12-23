@@ -1,5 +1,6 @@
 package model.asset;
 
+import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,8 +33,8 @@ public class AssetSource {
         this.accounts.remove(account);
     }
 
-    public double getTotalEurValue() {
-        return this.accounts.stream().mapToDouble(Account::getTotalEurValue).sum();
+    public BigDecimal getTotalEurValue() {
+        return this.accounts.stream().map(Account::getTotalEurValue).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     @Override

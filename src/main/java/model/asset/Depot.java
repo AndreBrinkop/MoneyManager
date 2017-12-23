@@ -2,6 +2,8 @@ package model.asset;
 
 import util.NumberHelper;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.List;
 
 import static util.NumberHelper.roundValue;
@@ -16,36 +18,36 @@ public class Depot extends Account {
     }
 
     @Override
-    public Double getTotalEurValue() {
-        return NumberHelper.roundValue(this.depotPositions.stream().mapToDouble(DepotPosition::getEuroValue).sum());
+    public BigDecimal getTotalEurValue() {
+        return NumberHelper.roundValue(this.depotPositions.stream().map(DepotPosition::getEuroValue).reduce(BigDecimal.ZERO, BigDecimal::add));
     }
 
-    public Double getTotalWinLoss() {
+    public BigDecimal getTotalWinLoss() {
         if (this.depotPositions.stream().filter(depotPosition -> depotPosition.getBuyValue() == null).findAny().isPresent()) {
             return null;
         }
-        return this.depotPositions.stream().mapToDouble(DepotPosition::getTotalWinLoss).sum();
+        return this.depotPositions.stream().map(DepotPosition::getTotalWinLoss).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public Double getTotalWinLossPercentage() {
+    public BigDecimal getTotalWinLossPercentage() {
         if (this.depotPositions.stream().filter(depotPosition -> depotPosition.getBuyValue() == null).findAny().isPresent()) {
             return null;
         }
-        Double totalValue = getTotalEurValue();
-        Double totalBuyValue = totalValue - getTotalWinLoss();
-        return (totalValue / totalBuyValue - 1) * 100;
+        BigDecimal totalValue = getTotalEurValue();
+        BigDecimal totalBuyValue = totalValue.subtract(getTotalWinLoss());
+        return (totalValue.divide(totalBuyValue, MathContext.DECIMAL128).subtract(new BigDecimal(1))).multiply(new BigDecimal(100));
     }
 
     @Override
     public String toString() {
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append(name + ": " + roundValue(getTotalEurValue()) + " €");
-        Double winLossPercentage = roundValue(getTotalWinLossPercentage());
+        BigDecimal winLossPercentage = roundValue(getTotalWinLossPercentage());
         if (winLossPercentage != null) {
             stringBuffer.append(" (")
-                    .append(winLossPercentage > 0.0d ? "+" : "")
+                    .append(winLossPercentage.doubleValue() > 0.0d ? "+" : "")
                     .append(winLossPercentage + " %, ")
-                    .append(winLossPercentage > 0.0d ? "+" : "")
+                    .append(winLossPercentage.doubleValue() > 0.0d ? "+" : "")
                     .append(roundValue(getTotalWinLoss()) + " €)");
         }
         stringBuffer.append("\n");

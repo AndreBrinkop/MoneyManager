@@ -8,6 +8,7 @@ import model.asset.CurrencyAccount;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 public class KrakenAssetChecker extends AssetChecker {
@@ -26,30 +27,30 @@ public class KrakenAssetChecker extends AssetChecker {
     }
 
     public List<Account> retrieveAccounts() throws ApiException {
-        Map<String, Double> assets = getAssetValues();
-        Map<String, Double> conversionRates = getConversionRatesToEur(assets.keySet());
+        Map<String, BigDecimal> assets = getAssetValues();
+        Map<String, BigDecimal> conversionRates = getConversionRatesToEur(assets.keySet());
         return createAssetObjects(assets, conversionRates);
     }
 
-    private List<Account> createAssetObjects(Map<String, Double> assets, Map<String, Double> conversionRates) throws ApiException {
+    private List<Account> createAssetObjects(Map<String, BigDecimal> assets, Map<String, BigDecimal> conversionRates) throws ApiException {
         List<Account> accountList = new LinkedList<>();
-        assets.forEach((String currency, Double value) -> {
-            Double eurValue = getEurValue(currency, value, conversionRates);
+        assets.forEach((String currency, BigDecimal value) -> {
+            BigDecimal eurValue = getEurValue(currency, value, conversionRates);
             accountList.add(new CurrencyAccount(getName(), currency, value, eurValue));
         });
         return accountList;
     }
 
-    private Double getEurValue(String currency, Double value, Map<String, Double> conversionRates) {
+    private BigDecimal getEurValue(String currency, BigDecimal value, Map<String, BigDecimal> conversionRates) {
         if ("ZEUR".equals(currency)) {
             return value;
         }
-        Double conversionRate = conversionRates.get(currency);
-        return value * conversionRate;
+        BigDecimal conversionRate = conversionRates.get(currency);
+        return value.multiply(conversionRate);
     }
 
-    private Map<String, Double> getConversionRatesToEur(Set<String> currencies) throws ApiException {
-        Map<String, Double> conversionRates = new HashMap<>();
+    private Map<String, BigDecimal> getConversionRatesToEur(Set<String> currencies) throws ApiException {
+        Map<String, BigDecimal> conversionRates = new HashMap<>();
         if (currencies.isEmpty()) {
             return conversionRates;
         }
@@ -79,9 +80,9 @@ public class KrakenAssetChecker extends AssetChecker {
                 }
 
                 JSONObject resultPair = response.getJSONObject("result").getJSONObject(currency + "ZEUR");
-                Double askPrice = resultPair.getJSONArray("a").getDouble(0);
-                Double bidPrice = resultPair.getJSONArray("b").getDouble(0);
-                Double averagePrice = (askPrice + bidPrice) / 2.0f;
+                BigDecimal askPrice = resultPair.getJSONArray("a").getBigDecimal(0);
+                BigDecimal bidPrice = resultPair.getJSONArray("b").getBigDecimal(0);
+                BigDecimal averagePrice = (askPrice.add(bidPrice)).divide(new BigDecimal(2.0f));
                 conversionRates.put(currency, averagePrice);
             }
 
@@ -91,9 +92,9 @@ public class KrakenAssetChecker extends AssetChecker {
         }
     }
 
-    private Map<String, Double> getAssetValues() throws ApiException {
+    private Map<String, BigDecimal> getAssetValues() throws ApiException {
         try {
-            Map<String, Double> assets = new HashMap<>();
+            Map<String, BigDecimal> assets = new HashMap<>();
 
             Map<String, String> input = new HashMap<>();
             input.put("asset", "");
@@ -106,7 +107,7 @@ public class KrakenAssetChecker extends AssetChecker {
 
             JSONObject retrievedAssets = response.getJSONObject("result");
             retrievedAssets.keySet().forEach(currency -> {
-                Double amount = retrievedAssets.getDouble(currency);
+                BigDecimal amount = retrievedAssets.getBigDecimal(currency);
                 assets.put(currency, amount);
             });
 

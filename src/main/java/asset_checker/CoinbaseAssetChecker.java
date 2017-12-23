@@ -17,6 +17,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -76,14 +77,14 @@ public class CoinbaseAssetChecker extends AssetChecker {
 
             String name = jsonAccountObject.getString("name");
             String currency = balanceJsonObject.getString("currency");
-            Double amount = balanceJsonObject.getDouble("amount");
+            BigDecimal amount = balanceJsonObject.getBigDecimal("amount");
 
             if (!"EUR".equals(currency)) {
-                Double exchangeRate = 0.0D;
-                if (amount >= 0.0D) {
+                BigDecimal exchangeRate = BigDecimal.ZERO;
+                if (amount.doubleValue() >= 0.0D) {
                     exchangeRate = retrieveExchangeRateToEuro(currency);
                 }
-                accounts.add(new CurrencyAccount(name, currency, amount, amount * exchangeRate));
+                accounts.add(new CurrencyAccount(name, currency, amount, amount.multiply(exchangeRate)));
             } else {
                 accounts.add(new BasicAccount(name, amount));
             }
@@ -91,13 +92,13 @@ public class CoinbaseAssetChecker extends AssetChecker {
         return accounts;
     }
 
-    private Double retrieveExchangeRateToEuro(String currency) throws ApiException {
+    private BigDecimal retrieveExchangeRateToEuro(String currency) throws ApiException {
         String url = "https://api.coinbase.com/v2/prices/" + currency + "-EUR/spot";
         try {
             Content content = executor.execute(Request.Get(url)).returnContent();
             JSONObject jsonObject = new JSONObject(content.toString());
             JSONObject jsonDataObject = jsonObject.getJSONObject("data");
-            Double amount = jsonDataObject.getDouble("amount");
+            BigDecimal amount = jsonDataObject.getBigDecimal("amount");
             return amount;
         } catch (IOException e) {
             throw new ApiException("Could not retrieve exchange rate for: " + currency + ".");

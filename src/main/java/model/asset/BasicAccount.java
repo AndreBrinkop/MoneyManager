@@ -1,16 +1,18 @@
 package model.asset;
 
+import java.math.BigDecimal;
+
 public class BasicAccount extends Account {
 
-    private Double euroBalance;
+    private BigDecimal euroBalance;
 
-    public BasicAccount(String name, Double euroBalance) {
+    public BasicAccount(String name, BigDecimal euroBalance) {
         super(name);
         this.euroBalance = euroBalance;
     }
 
     @Override
-    public Double getTotalEurValue() {
+    public BigDecimal getTotalEurValue() {
         return euroBalance;
     }
 

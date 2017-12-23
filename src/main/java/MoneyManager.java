@@ -6,6 +6,7 @@ import model.asset.AssetSource;
 import util.EncryptedProperties;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -41,14 +42,14 @@ public class MoneyManager {
         // properties.store(new FileOutputStream("properties.encrypted"), null);
 
         MoneyManager moneyManager = new MoneyManager();
-        Double oldTotalAmount = Double.valueOf(properties.getProperty("totalAmount", "0.0d"));
-        Double totalAmount = moneyManager.retrieveAssets(properties);
-        Double delta = roundValue(totalAmount - oldTotalAmount);
+        BigDecimal oldTotalAmount = new BigDecimal(properties.getProperty("totalAmount", "0.0d"));
+        BigDecimal totalAmount = moneyManager.retrieveAssets(properties);
+        BigDecimal delta = roundValue(totalAmount.subtract(oldTotalAmount));
 
         System.out.println("--------------------");
         System.out.println("Old Total: " + oldTotalAmount + " €");
         System.out.println("New Total: " + totalAmount + " €");
-        System.out.println("\t\t\t" + (delta > 0.0 ? "+" : "") + delta + " €");
+        System.out.println("\t\t\t" + (delta.doubleValue() > 0.0 ? "+" : "") + delta + " €");
 
         properties.put("totalAmount", totalAmount.toString());
         properties.store(new FileOutputStream("properties.encrypted"), null);
@@ -66,7 +67,7 @@ public class MoneyManager {
         return encryptionKey;
     }
 
-    private Double retrieveAssets(Properties properties) throws IOException {
+    private BigDecimal retrieveAssets(Properties properties) throws IOException {
         List<AssetChecker> assetChecker = new LinkedList<>();
 
         assetChecker.add(new SparkasseHannoverAssetChecker(properties.getProperty("sparkasseHannover.username"), properties.getProperty("sparkasseHannover.password")));
@@ -75,19 +76,23 @@ public class MoneyManager {
         assetChecker.add(new EquatePlusAssetChecker(properties.getProperty("equate.username"), properties.getProperty("equate.password")));
         assetChecker.add(new BitcoinDeAssetChecker(properties.getProperty("bitcoinDe.username"), properties.getProperty("bitcoinDe.password")));
         assetChecker.add(new KrakenAssetChecker(properties.getProperty("kraken.apikey"), properties.getProperty("kraken.apisecret")));
+        assetChecker.add(new CoinbaseAssetChecker(properties.getProperty("coinbase.apikey"), properties.getProperty("coinbase.apisecret")));
         assetChecker.add(new PayPalAssetChecker(properties.getProperty("payPal.apiUser"), properties.getProperty("payPal.apiKey"), properties.getProperty("payPal.apiSignature")));
         assetChecker.add(new AmazonVisaAssetChecker(properties.getProperty("amazonVisa.username"), properties.getProperty("amazonVisa.password")));
-        assetChecker.add(new CoinbaseAssetChecker(properties.getProperty("coinbase.apikey"), properties.getProperty("coinbase.apisecret")));
         assetChecker.add(new OfflineAssetChecker("Tesla Model 3 Reservation", 1000.0));
 
         List<AssetSource> assetSourceList = new LinkedList<>();
 
         for (AssetChecker checker : assetChecker) {
-            System.out.println("Retrieving assets from: " + checker.getName());
-            try {
-                assetSourceList.add(checker.retrieveAssets());
-            } catch (ApiException e) {
-                e.printStackTrace();
+            boolean done = false;
+            while (!done) {
+                System.out.println("Retrieving assets from: " + checker.getName());
+                try {
+                    assetSourceList.add(checker.retrieveAssets());
+                    done = true;
+                } catch (ApiException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -100,7 +105,7 @@ public class MoneyManager {
             System.out.println(assetSource);
         }
 
-        Double totalAmount = roundValue(assetSourceList.stream().mapToDouble(AssetSource::getTotalEurValue).sum());
+        BigDecimal totalAmount = roundValue(assetSourceList.stream().map(AssetSource::getTotalEurValue).reduce(BigDecimal.ZERO, BigDecimal::add));
         return totalAmount;
     }
 

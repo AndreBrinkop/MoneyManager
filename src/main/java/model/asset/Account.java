@@ -1,5 +1,7 @@
 package model.asset;
 
+import java.math.BigDecimal;
+
 public abstract class Account {
 
     String name;
@@ -8,7 +10,7 @@ public abstract class Account {
         this.name = name;
     }
 
-    public abstract Double getTotalEurValue();
+    public abstract BigDecimal getTotalEurValue();
 
     public String getName() {
         return name;

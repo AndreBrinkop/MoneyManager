@@ -17,10 +17,12 @@ import org.kapott.hbci.manager.HBCIUtils;
 import org.kapott.hbci.passport.HBCIPassport;
 import org.kapott.hbci.passport.HBCIPassportPinTan;
 import org.kapott.hbci.status.HBCIExecStatus;
+import org.kapott.hbci.structures.BigDecimalValue;
 import org.kapott.hbci.structures.Konto;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -98,7 +100,7 @@ public abstract class HBCIAssetChecker extends AssetChecker {
                     assetList.add(depot);
                 } else {
                     String accountDescription = konto.type + " " + konto.number;
-                    Double accountValue = getAccountValue(passport, hbciHandle, konto);
+                    BigDecimal accountValue = getAccountValue(passport, hbciHandle, konto);
                     assetList.add(new BasicAccount(accountDescription, accountValue));
                 }
             }
@@ -143,7 +145,13 @@ public abstract class HBCIAssetChecker extends AssetChecker {
     private List<DepotPosition> createDepotPositions(GVRWPDepotList.Entry.Gattung[] entries) {
         List<DepotPosition> depotPositions = new LinkedList<>();
         for (GVRWPDepotList.Entry.Gattung entry : entries) {
-            depotPositions.add(new DepotPosition(formatName(entry.name), entry.isin, entry.wkn, entry.saldo.getValue(), entry.price.getValue(), entry.einstandspreis.getValue()));
+            BigDecimalValue saldo = entry.saldo;
+            BigDecimalValue price = entry.price;
+            BigDecimalValue einstandspreis = entry.einstandspreis;
+            depotPositions.add(new DepotPosition(formatName(entry.name), entry.isin, entry.wkn,
+                    saldo == null ? null : saldo.getValue(),
+                    price == null ? null : price.getValue(),
+                    einstandspreis == null ? null : einstandspreis.getValue()));
         }
         return depotPositions;
     }
@@ -153,7 +161,7 @@ public abstract class HBCIAssetChecker extends AssetChecker {
         return WordUtils.capitalizeFully(name, new char[]{' ', '.', '-', ',', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'});
     }
 
-    private Double getAccountValue(HBCIPassport hbciPassport, HBCIHandler hbciHandle, Konto account) throws ApiException {
+    private BigDecimal getAccountValue(HBCIPassport hbciPassport, HBCIHandler hbciHandle, Konto account) throws ApiException {
         HBCIJob auszug = hbciHandle.newJob("SaldoReq");
         auszug.setParam("my", account);
 
@@ -163,10 +171,10 @@ public abstract class HBCIAssetChecker extends AssetChecker {
         GVRSaldoReq result = (GVRSaldoReq) auszug.getJobResult();
 
         if (result.isOK()) {
-            Double bookedValue = Double.valueOf(result.getResultData().getProperty("content.booked.BTG.value"));
+            BigDecimal bookedValue = new BigDecimal(result.getResultData().getProperty("content.booked.BTG.value"));
             String pendingValueProperty = result.getResultData().getProperty("content.pending.BTG.value");
-            Double pendingValue = pendingValueProperty != null ? Double.valueOf(pendingValueProperty) : Double.MIN_VALUE;
-            return Math.max(bookedValue, pendingValue);
+            BigDecimal pendingValue = pendingValueProperty != null ? new BigDecimal(pendingValueProperty) : BigDecimal.ZERO;
+            return bookedValue.max(pendingValue);
 
         } else {
             String error = "";

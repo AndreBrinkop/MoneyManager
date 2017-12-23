@@ -1,6 +1,7 @@
 package model.asset;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 
 import static util.NumberHelper.roundValue;
 
@@ -10,56 +11,56 @@ public class DepotPosition {
     private String isin;
     private String wkn;
 
-    private Double amount;
-    private Double pricePerUnit;
-    private Double buyValue;
+    private BigDecimal amount;
+    private BigDecimal pricePerUnit;
+    private BigDecimal buyValue;
 
     public DepotPosition(String name, String isin, String wkn, BigDecimal amount, BigDecimal pricePerUnit, BigDecimal buyValue) {
         this.name = name;
         this.isin = isin;
         this.wkn = wkn;
-        this.amount = amount.doubleValue();
-        this.pricePerUnit = pricePerUnit.doubleValue();
-        this.buyValue = buyValue.doubleValue();
+        this.amount = amount;
+        this.pricePerUnit = pricePerUnit;
+        this.buyValue = buyValue;
     }
 
-    public DepotPosition(String name, Double amount, Double pricePerUnit) {
+    public DepotPosition(String name, BigDecimal amount, BigDecimal pricePerUnit) {
         this.name = name;
         this.amount = amount;
         this.pricePerUnit = pricePerUnit;
     }
 
-    public Double getEuroValue() {
-        return amount * pricePerUnit;
+    public BigDecimal getEuroValue() {
+        return amount.multiply(pricePerUnit);
     }
 
-    public Double getBuyValue() {
+    public BigDecimal getBuyValue() {
         return buyValue;
     }
 
-    public Double getWinLossPercentage() {
+    public BigDecimal getWinLossPercentage() {
         if (buyValue == null) {
             return null;
         }
-        return ((pricePerUnit / buyValue) - 1) * 100.0d;
+        return (pricePerUnit.divide(buyValue, MathContext.DECIMAL128).subtract(new BigDecimal(1))).multiply(new BigDecimal(100));
     }
 
-    public Double getTotalWinLoss() {
+    public BigDecimal getTotalWinLoss() {
         if (buyValue == null) {
             return null;
         }
-        return (pricePerUnit - buyValue) * amount;
+        return (pricePerUnit.subtract(buyValue)).multiply(amount);
     }
 
     @Override
     public String toString() {
         StringBuffer stringBuffer = new StringBuffer().append(amount + " " + name + ": " + roundValue(getEuroValue()) + " €");
         if (buyValue != null) {
-            Double winLossPercentage = roundValue(getWinLossPercentage());
+            BigDecimal winLossPercentage = roundValue(getWinLossPercentage());
             stringBuffer.append(" (")
-                    .append(winLossPercentage > 0.0d ? "+" : "")
+                    .append(winLossPercentage.doubleValue() > 0.0d ? "+" : "")
                     .append(winLossPercentage + " %, ")
-                    .append(winLossPercentage > 0.0d ? "+" : "")
+                    .append(winLossPercentage.doubleValue() > 0.0d ? "+" : "")
                     .append(roundValue(getTotalWinLoss()) + " €)");
         }
 

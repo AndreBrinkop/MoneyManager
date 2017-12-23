@@ -1,14 +1,15 @@
 package util;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 public class NumberHelper {
 
-    public static Double roundValue(Double averagePrice) {
-        if (averagePrice == null) {
-            return averagePrice;
+    public static BigDecimal roundValue(BigDecimal value) {
+        if (value == null) {
+            return value;
         }
-
-        int scale = (int) Math.pow(10, 2);
-        return (double) Math.round(averagePrice * scale) / scale;
+        return value.setScale(2, RoundingMode.CEILING);
     }
 
 }

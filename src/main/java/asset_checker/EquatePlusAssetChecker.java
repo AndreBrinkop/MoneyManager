@@ -14,6 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.*;
 
 import static java.util.Arrays.asList;
@@ -34,7 +35,7 @@ public class EquatePlusAssetChecker extends HTTPAssetChecker {
     public List<Account> retrieveAssetsWithActiveSession() throws ApiException {
         List<Account> accounts;
         try {
-            Map<String, Double> sharePrices = retrieveSharePrices();
+            Map<String, BigDecimal> sharePrices = retrieveSharePrices();
             accounts = retrieveAssets(sharePrices);
         } catch (Exception e) {
             throw new ApiException("Could not retrieve assets.", e);
@@ -42,7 +43,7 @@ public class EquatePlusAssetChecker extends HTTPAssetChecker {
         return accounts;
     }
 
-    private List<Account> retrieveAssets(Map<String, Double> sharePrices) throws IOException {
+    private List<Account> retrieveAssets(Map<String, BigDecimal> sharePrices) throws IOException {
         List<Account> accountList = new LinkedList<>();
         String planSummaryUrl = "https://www.equateplus.com/EquatePlusParticipant2/services/planSummary/get";
 
@@ -57,27 +58,27 @@ public class EquatePlusAssetChecker extends HTTPAssetChecker {
             summaryEntries.forEach(summaryEntry -> {
                 String summaryType = ((JSONObject) summaryEntry).getString("type");
                 if ("TOTAL".equals(summaryType)) {
-                    Double amount = ((JSONObject) summaryEntry).getJSONObject("quantity").getDouble("amount");
-                    Double totalValue = ((JSONObject) summaryEntry).getJSONObject("value").getDouble("amount");
+                    BigDecimal amount = ((JSONObject) summaryEntry).getJSONObject("quantity").getBigDecimal("amount");
+                    BigDecimal totalValue = ((JSONObject) summaryEntry).getJSONObject("value").getBigDecimal("amount");
 
                     String stockDescription;
 
                     if (sharePrices.keySet().size() == 1) {
                         stockDescription = sharePrices.keySet().stream().findAny().get();
                     } else {
-                        Double calculatedValue = totalValue / amount;
+                        BigDecimal calculatedValue = totalValue.divide(amount);
                         stockDescription = sharePrices.entrySet().stream().filter(v -> Objects.equals(v.getValue(), calculatedValue)).findAny().get().getKey();
                     }
-                    accountList.add(new Depot("Depot", asList(new DepotPosition(stockDescription, amount, totalValue / amount))));
+                    accountList.add(new Depot("Depot", asList(new DepotPosition(stockDescription, amount, totalValue.divide(amount)))));
                 }
             });
         });
         return accountList;
     }
 
-    private Map<String, Double> retrieveSharePrices() throws IOException, ApiException {
+    private Map<String, BigDecimal> retrieveSharePrices() throws IOException, ApiException {
         String sharePricesUrl = "https://www.equateplus.com/EquatePlusParticipant2/services/sharePrice/vehicles";
-        Map<String, Double> sharePrices = new HashMap<>();
+        Map<String, BigDecimal> sharePrices = new HashMap<>();
 
         Response response = executor.execute(Request.Get(sharePricesUrl));
         Content content = response.returnContent();
@@ -88,7 +89,7 @@ public class EquatePlusAssetChecker extends HTTPAssetChecker {
         entries.forEach(entry -> {
             String stockDescription = ((JSONObject) entry).getString("vehicleDescription");
             JSONObject currentPriceObject = ((JSONObject) entry).getJSONObject("currentPrice");
-            Double stockPrice = currentPriceObject.getDouble("amount");
+            BigDecimal stockPrice = currentPriceObject.getBigDecimal("amount");
             sharePrices.put(stockDescription, stockPrice);
         });
 

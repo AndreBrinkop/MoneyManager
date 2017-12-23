@@ -13,6 +13,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -37,7 +38,7 @@ public class AuxmoneyAssetChecker extends HTTPAssetChecker {
         return accountList;
     }
 
-    private Double retrieveFixedCapitalBalance() throws ApiException {
+    private BigDecimal retrieveFixedCapitalBalance() throws ApiException {
         String auxmoneyPortfolioUrl = "https://www.auxmoney.com/anlegercockpit/portfolio";
 
         try {
@@ -47,7 +48,7 @@ public class AuxmoneyAssetChecker extends HTTPAssetChecker {
                 Element rowElement = rowElementOptional.get();
                 String balanceString = rowElement.getElementsByTag("td").last().text();
                 balanceString = balanceString.substring(0, balanceString.length() - 2).replaceAll(",", ".");
-                return Double.valueOf(balanceString);
+                return new BigDecimal(balanceString);
             }
 
             throw new ApiException("Could not retrieve assets.");
@@ -56,7 +57,7 @@ public class AuxmoneyAssetChecker extends HTTPAssetChecker {
         }
     }
 
-    private Double retrieveInvestmentAccountBalance() throws ApiException {
+    private BigDecimal retrieveInvestmentAccountBalance() throws ApiException {
         String auxmoneyInvestmentAccountUrl = "https://www.auxmoney.com/anlegercockpit/investaccount";
 
         try {
@@ -64,7 +65,7 @@ public class AuxmoneyAssetChecker extends HTTPAssetChecker {
             Element balanceElement = doc.getElementsByClass("uxTable--number").last();
             String balanceString = balanceElement.text();
             balanceString = balanceString.substring(4).replaceAll(",", ".");
-            return Double.valueOf(balanceString);
+            return new BigDecimal(balanceString);
         } catch (IOException e) {
             throw new ApiException("Could not retrieve assets.", e);
         }

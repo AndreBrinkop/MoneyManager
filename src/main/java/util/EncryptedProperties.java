@@ -39,10 +39,16 @@ public class EncryptedProperties extends Properties {
 
     @Override
     public synchronized Object put(Object key, Object value) {
+        String property = getProperty(key.toString());
+        if (property != null) {
+            remove(key);
+        }
+
         if (key instanceof String && value instanceof String) {
             String encryptedKey = CryptoHelper.encrypt((String) key, encryptionKey);
             String encryptedValue = CryptoHelper.encrypt((String) value, encryptionKey);
-            return super.put(encryptedKey, encryptedValue);
+            super.put(encryptedKey, encryptedValue);
+            return property;
         }
 
         throw new NotImplementedException();
@@ -50,12 +56,6 @@ public class EncryptedProperties extends Properties {
 
     @Override
     public synchronized Object putIfAbsent(Object key, Object value) {
-        if (key instanceof String && value instanceof String) {
-            String encryptedKey = CryptoHelper.encrypt((String) key, encryptionKey);
-            String encryptedValue = CryptoHelper.encrypt((String) value, encryptionKey);
-            return super.putIfAbsent(encryptedKey, encryptedValue);
-        }
-
         throw new NotImplementedException();
     }
 
@@ -114,6 +114,6 @@ public class EncryptedProperties extends Properties {
             }
         }
 
-        throw new NotImplementedException();
+        return null;
     }
 }

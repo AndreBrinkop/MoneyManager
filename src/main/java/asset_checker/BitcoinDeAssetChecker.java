@@ -14,6 +14,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -160,9 +161,9 @@ public class BitcoinDeAssetChecker extends HTTPAssetChecker {
 
                 // First condition: Currency not yet supported by Bitcoin.de
                 if (!"---".equals(euroValueString) && !"-".equals(amountString)) {
-                    double amount = Double.valueOf(amountString);
-                    double euroValue = Double.valueOf(euroValueString);
-                    if (amount > 0.0) {
+                    BigDecimal amount = new BigDecimal(amountString);
+                    BigDecimal euroValue = new BigDecimal(euroValueString);
+                    if (amount.doubleValue() > 0.0) {
                         accountList.add(new CurrencyAccount(getName(), currency, amount, euroValue));
                     }
                 }

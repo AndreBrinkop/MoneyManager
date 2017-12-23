@@ -14,6 +14,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -106,7 +107,7 @@ public class AmazonVisaAssetChecker extends HTTPAssetChecker {
                     String balanceString = tdElement.last().text();
                     balanceString = balanceString.substring("EUR  ".length(), balanceString.length());
                     balanceString = balanceString.replaceAll(",", ".");
-                    Double balance = Double.valueOf(balanceString);
+                    BigDecimal balance = new BigDecimal(balanceString);
                     accountList.add(new BasicAccount(getName(), balance));
                 }
             }

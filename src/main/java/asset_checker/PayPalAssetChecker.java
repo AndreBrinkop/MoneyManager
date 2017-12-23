@@ -15,6 +15,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.HttpClients;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -65,7 +66,7 @@ public class PayPalAssetChecker extends AssetChecker {
 
     private List<Account> parseResponseValues(Map<String, String> responseValues) throws ApiException {
         List<Account> accountList = new LinkedList<>();
-        Map<String, Double> assetValues = new HashMap<>();
+        Map<String, BigDecimal> assetValues = new HashMap<>();
 
         if (responseValues.get("ACK") == null || !responseValues.get("ACK").equals("Success")) {
             throw new ApiException("Could not retrieve assets.");
@@ -76,7 +77,7 @@ public class PayPalAssetChecker extends AssetChecker {
                 String amountPrefix = "L_AMT";
                 if (key.startsWith(amountPrefix)) {
                     String amountString = responseValues.get(key);
-                    Double amount = Double.valueOf(amountString);
+                    BigDecimal amount = new BigDecimal(amountString);
                     String currencyKey = "L_CURRENCYCODE" + key.substring(amountPrefix.length(), key.length());
                     String currency = responseValues.get(currencyKey);
                     assetValues.put(currency, amount);

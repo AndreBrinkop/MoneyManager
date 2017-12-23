@@ -1,21 +1,23 @@
 package model.asset;
 
+import java.math.BigDecimal;
+
 import static util.NumberHelper.roundValue;
 
 public class CurrencyAccount extends Account {
 
-    private Double currencyValue;
+    private BigDecimal currencyValue;
     private String currency;
-    private Double euroValue;
+    private BigDecimal euroValue;
 
-    public CurrencyAccount(String name, String currency, Double currencyValue, Double euroValue) {
+    public CurrencyAccount(String name, String currency, BigDecimal currencyValue, BigDecimal euroValue) {
         super(name);
         this.currencyValue = currencyValue;
         this.currency = currency;
         this.euroValue = euroValue;
     }
 
-    public Double getCurrencyValue() {
+    public BigDecimal getCurrencyValue() {
         return currencyValue;
     }
 
@@ -24,7 +26,7 @@ public class CurrencyAccount extends Account {
     }
 
     @Override
-    public Double getTotalEurValue() {
+    public BigDecimal getTotalEurValue() {
         return euroValue;
     }
 

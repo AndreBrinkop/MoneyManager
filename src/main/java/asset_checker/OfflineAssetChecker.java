@@ -5,6 +5,7 @@ import model.AssetChecker;
 import model.asset.Account;
 import model.asset.BasicAccount;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,6 +22,13 @@ public class OfflineAssetChecker extends AssetChecker {
     }
 
     public OfflineAssetChecker(String name, Double euroValue) {
+        this.name = name;
+        this.accountList = new LinkedList<>();
+        this.accountList.add(new BasicAccount(name, new BigDecimal(euroValue)));
+    }
+
+
+    public OfflineAssetChecker(String name, BigDecimal euroValue) {
         this.name = name;
         this.accountList = new LinkedList<>();
         this.accountList.add(new BasicAccount(name, euroValue));
