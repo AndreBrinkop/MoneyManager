@@ -82,7 +82,7 @@ public class CoinbaseAssetChecker extends AssetChecker {
             if (!"EUR".equals(currency)) {
                 BigDecimal exchangeRate = BigDecimal.ZERO;
                 if (amount.doubleValue() >= 0.0D) {
-                    exchangeRate = retrieveExchangeRateToEuro(currency);
+                    exchangeRate = retrieveExchangeRateToEuro(executor, currency);
                 }
                 accounts.add(new CurrencyAccount(name, currency, amount, amount.multiply(exchangeRate)));
             } else {
@@ -92,7 +92,7 @@ public class CoinbaseAssetChecker extends AssetChecker {
         return accounts;
     }
 
-    private BigDecimal retrieveExchangeRateToEuro(String currency) throws ApiException {
+    public static BigDecimal retrieveExchangeRateToEuro(Executor executor, String currency) throws ApiException {
         String url = "https://api.coinbase.com/v2/prices/" + currency + "-EUR/spot";
         try {
             Content content = executor.execute(Request.Get(url)).returnContent();
