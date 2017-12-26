@@ -5,6 +5,7 @@ import model.ApiException;
 import org.apache.http.client.fluent.Content;
 import org.apache.http.client.fluent.Request;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -63,7 +64,7 @@ public class EthereumAssetChecker extends CryptoCurrencyAssetChecker {
                 BigDecimal balance = decimalsToWholeUnit(resultJsonObject.getBigDecimal("balance"));
                 balances[addressList.indexOf(address)] = balance;
             }
-        } catch (IOException e) {
+        } catch (IOException | JSONException e) {
             throw new ApiException("Could not get balance for Ethereum addresses.", e);
         }
         return Arrays.asList(balances);
