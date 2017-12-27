@@ -2,35 +2,35 @@ package model.asset;
 
 public class AssetSourceCredentials {
 
-    private final String name;
+    private final String type;
     private final String user;
 
     private final String key;
     private final String secret;
 
-    public AssetSourceCredentials(String name, String user, String key, String secret) {
-        this.name = name;
+    public AssetSourceCredentials(String type, String user, String key, String secret) {
+        this.type = type;
         this.user = user;
         this.key = key;
         this.secret = secret;
     }
 
-    public AssetSourceCredentials(String name, String user, String key) {
-        this.name = name;
+    public AssetSourceCredentials(String type, String user, String key) {
+        this.type = type;
         this.user = user;
         this.key = key;
         this.secret = null;
     }
 
-    public AssetSourceCredentials(String name, String user) {
-        this.name = name;
+    public AssetSourceCredentials(String type, String user) {
+        this.type = type;
         this.user = user;
         this.key = null;
         this.secret = null;
     }
 
-    public String getName() {
-        return name;
+    public String getType() {
+        return type;
     }
 
     public String getUser() {

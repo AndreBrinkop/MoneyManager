@@ -1,58 +1,75 @@
-import asset_checker.*;
+import database.DatabaseConnection;
 import model.ApiException;
-import model.AssetChecker;
 import model.asset.Account;
 import model.asset.AssetSource;
-import util.EncryptedProperties;
+import model.asset.AssetSourceCredentials;
+import model.asset_checker.*;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
 
 import static util.NumberHelper.roundValue;
 
 public class MoneyManager {
 
     public static void main(String[] args) throws Exception {
-        // Load existing properties
-        Properties properties = new EncryptedProperties(getEncryptionKey());
-        File file = new File("properties.encrypted");
-        InputStream inputStream = new FileInputStream(file);
-        properties.load(inputStream);
-
-
-        // Encrypt new properties
-        /*
-        Properties properties = new util.EncryptedProperties(getEncryptionKey());
-        Properties plainProperties = new Properties();
-        InputStream inputStream = new FileInputStream("config.properties");
-        plainProperties.load(inputStream);
-
-        plainProperties.stringPropertyNames().forEach(propertyName -> {
-            properties.put(propertyName, plainProperties.getProperty(propertyName));
-        });
-        */
-
-        // Add additional properties
-        // properties.put("key", "value");
-
-        // Write back properties
-        // properties.store(new FileOutputStream("properties.encrypted"), null);
+        DatabaseConnection databaseConnection = new DatabaseConnection(getEncryptionKey());
+        List<AssetSourceCredentials> credentials = databaseConnection.getAssetSourceCredentials();
+        AssetSource offlineAccounts = databaseConnection.getOfflineAccountAssetSource();
+        List<AssetChecker> assetCheckers = createAssetCheckers(credentials);
 
         MoneyManager moneyManager = new MoneyManager();
-        BigDecimal oldTotalAmount = new BigDecimal(properties.getProperty("totalAmount", "0.0d"));
-        BigDecimal totalAmount = moneyManager.retrieveAssets(properties);
-        BigDecimal delta = roundValue(totalAmount.subtract(oldTotalAmount));
+        BigDecimal totalAmount = moneyManager.retrieveAssets(assetCheckers, offlineAccounts);
 
         System.out.println("--------------------");
-        System.out.println("Old Total: " + oldTotalAmount + " €");
+        //System.out.println("Old Total: " + oldTotalAmount + " €");
         System.out.println("New Total: " + totalAmount + " €");
-        System.out.println("\t\t\t" + (delta.doubleValue() > 0.0 ? "+" : "") + delta + " €");
+        //System.out.println("\t\t\t" + (delta.doubleValue() > 0.0 ? "+" : "") + delta + " €");
+    }
 
-        properties.put("totalAmount", totalAmount.toString());
-        properties.store(new FileOutputStream("properties.encrypted"), null);
+    private static List<AssetChecker> createAssetCheckers(List<AssetSourceCredentials> credentials) {
+        List<AssetChecker> assetCheckers = new LinkedList<>();
+        for (AssetSourceCredentials credentialsEntry : credentials) {
+            switch (credentialsEntry.getType()) {
+                case "SPARKASSE_HANNOVER":
+                    assetCheckers.add(new SparkasseHannoverAssetChecker(credentialsEntry));
+                    break;
+                case "ING_DIBA":
+                    assetCheckers.add(new INGDiBaAssetChecker(credentialsEntry));
+                    break;
+                case "AUXMONEY":
+                    assetCheckers.add(new AuxmoneyAssetChecker(credentialsEntry));
+                    break;
+                case "BITCOIN_DE":
+                    assetCheckers.add(new BitcoinDeAssetChecker(credentialsEntry));
+                    break;
+                case "KRAKEN":
+                    assetCheckers.add(new KrakenAssetChecker(credentialsEntry));
+                    break;
+                case "COINBASE":
+                    assetCheckers.add(new CoinbaseAssetChecker(credentialsEntry));
+                    break;
+                case "PAYPAL":
+                    assetCheckers.add(new PayPalAssetChecker(credentialsEntry));
+                    break;
+                case "AMAZON_VISA":
+                    assetCheckers.add(new AmazonVisaAssetChecker(credentialsEntry));
+                    break;
+                case "ETHEREUM":
+                    assetCheckers.add(new EthereumAssetChecker(credentialsEntry));
+                    break;
+                case "BITCOIN_CASH":
+                    assetCheckers.add(new BitcoinCashAssetChecker(credentialsEntry));
+                    break;
+                case "EQUATE_PLUS":
+                    assetCheckers.add(new EquatePlusAssetChecker(credentialsEntry));
+            }
+        }
+        return assetCheckers;
     }
 
     public static String getEncryptionKey() throws IOException {
@@ -67,23 +84,10 @@ public class MoneyManager {
         return encryptionKey;
     }
 
-    private BigDecimal retrieveAssets(Properties properties) throws IOException {
-        List<AssetChecker> assetChecker = new LinkedList<>();
-
-        assetChecker.add(new SparkasseHannoverAssetChecker(properties.getProperty("sparkasseHannover.username"), properties.getProperty("sparkasseHannover.password")));
-        assetChecker.add(new INGDiBaAssetChecker(properties.getProperty("ingDiBa.username"), properties.getProperty("ingDiBa.password")));
-        assetChecker.add(new AuxmoneyAssetChecker(properties.getProperty("auxmoney.username"), properties.getProperty("auxmoney.password")));
-        assetChecker.add(new EquatePlusAssetChecker(properties.getProperty("equate.username"), properties.getProperty("equate.password")));
-        assetChecker.add(new BitcoinDeAssetChecker(properties.getProperty("bitcoinDe.username"), properties.getProperty("bitcoinDe.password")));
-        assetChecker.add(new KrakenAssetChecker(properties.getProperty("kraken.apikey"), properties.getProperty("kraken.apisecret")));
-        assetChecker.add(new CoinbaseAssetChecker(properties.getProperty("coinbase.apikey"), properties.getProperty("coinbase.apisecret")));
-        assetChecker.add(new PayPalAssetChecker(properties.getProperty("payPal.apiUser"), properties.getProperty("payPal.apiKey"), properties.getProperty("payPal.apiSignature")));
-        assetChecker.add(new AmazonVisaAssetChecker(properties.getProperty("amazonVisa.username"), properties.getProperty("amazonVisa.password")));
-        assetChecker.add(new OfflineAssetChecker("Tesla Model 3 Reservation", 1000.0));
-
+    private BigDecimal retrieveAssets(List<AssetChecker> assetCheckers, AssetSource offlineAccounts) throws IOException {
         List<AssetSource> assetSourceList = new LinkedList<>();
 
-        for (AssetChecker checker : assetChecker) {
+        for (AssetChecker checker : assetCheckers) {
             boolean done = false;
             while (!done) {
                 System.out.println("Retrieving assets from: " + checker.getName());
@@ -95,6 +99,7 @@ public class MoneyManager {
                 }
             }
         }
+        assetSourceList.add(offlineAccounts);
 
         System.out.println();
 

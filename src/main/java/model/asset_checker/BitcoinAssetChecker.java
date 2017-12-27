@@ -1,7 +1,8 @@
-package asset_checker;
+package model.asset_checker;
 
-import asset_checker.abstract_checker.CryptoCurrencyAssetChecker;
 import model.ApiException;
+import model.asset.AssetSourceCredentials;
+import model.asset_checker.abstract_checker.CryptoCurrencyAssetChecker;
 import org.apache.http.client.fluent.Content;
 import org.apache.http.client.fluent.Executor;
 import org.apache.http.client.fluent.Request;
@@ -12,12 +13,12 @@ import java.util.List;
 
 public class BitcoinAssetChecker extends CryptoCurrencyAssetChecker {
 
-    public BitcoinAssetChecker(String address) {
-        super(address);
+    public BitcoinAssetChecker(AssetSourceCredentials credentials) {
+        super(credentials);
     }
 
-    public BitcoinAssetChecker(List<String> addressList) {
-        super(addressList);
+    public BitcoinAssetChecker(List<AssetSourceCredentials> credentialsList) {
+        super(credentialsList);
     }
 
     @Override

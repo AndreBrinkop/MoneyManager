@@ -1,9 +1,10 @@
-package asset_checker;
+package model.asset_checker;
 
-import asset_checker.abstract_checker.HTTPAssetChecker;
 import model.ApiException;
 import model.asset.Account;
+import model.asset.AssetSourceCredentials;
 import model.asset.CurrencyAccount;
+import model.asset_checker.abstract_checker.HTTPAssetChecker;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Content;
 import org.apache.http.client.fluent.Request;
@@ -24,10 +25,9 @@ public class BitcoinDeAssetChecker extends HTTPAssetChecker {
 
     private String logoutCsrfToken = "";
 
-    public BitcoinDeAssetChecker(String user, String password) {
-        super(user, password);
+    public BitcoinDeAssetChecker(AssetSourceCredentials credentials) {
+        super(credentials);
     }
-
     @Override
     public String getName() {
         return "Bitcoin.de";

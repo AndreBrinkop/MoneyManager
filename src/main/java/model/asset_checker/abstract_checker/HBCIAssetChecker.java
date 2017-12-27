@@ -1,11 +1,8 @@
-package asset_checker.abstract_checker;
+package model.asset_checker.abstract_checker;
 
 import model.ApiException;
-import model.AssetChecker;
-import model.asset.Account;
-import model.asset.BasicAccount;
-import model.asset.Depot;
-import model.asset.DepotPosition;
+import model.asset.*;
+import model.asset_checker.AssetChecker;
 import org.apache.commons.lang.WordUtils;
 import org.kapott.hbci.GV.HBCIJob;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
@@ -32,9 +29,9 @@ public abstract class HBCIAssetChecker extends AssetChecker {
     protected String user;
     protected String password;
 
-    public HBCIAssetChecker(String user, String password) {
-        this.user = user;
-        this.password = password;
+    public HBCIAssetChecker(AssetSourceCredentials credentials) {
+        this.user = credentials.getUser();
+        this.password = credentials.getKey();
     }
 
     public abstract String getName();

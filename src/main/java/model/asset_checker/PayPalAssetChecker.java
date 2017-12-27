@@ -1,9 +1,9 @@
-package asset_checker;
+package model.asset_checker;
 
 import com.google.common.base.Splitter;
 import model.ApiException;
-import model.AssetChecker;
 import model.asset.Account;
+import model.asset.AssetSourceCredentials;
 import model.asset.BasicAccount;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.CookieSpecs;
@@ -27,11 +27,11 @@ public class PayPalAssetChecker extends AssetChecker {
     private String apiKey;
     private String apiSignature;
 
-    public PayPalAssetChecker(String apiUser, String apiKey, String apiSignature) {
+    public PayPalAssetChecker(AssetSourceCredentials credentials) {
         super();
-        this.apiUser = apiUser;
-        this.apiKey = apiKey;
-        this.apiSignature = apiSignature;
+        this.apiUser = credentials.getUser();
+        this.apiKey = credentials.getKey();
+        this.apiSignature = credentials.getSecret();
     }
 
     @Override

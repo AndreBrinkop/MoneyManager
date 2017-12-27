@@ -1,11 +1,12 @@
-package asset_checker;
+package model.asset_checker;
 
-import asset_checker.abstract_checker.HBCIAssetChecker;
+import model.asset.AssetSourceCredentials;
+import model.asset_checker.abstract_checker.HBCIAssetChecker;
 
 public class SparkasseHannoverAssetChecker extends HBCIAssetChecker {
 
-    public SparkasseHannoverAssetChecker(String user, String password) {
-        super(user, password);
+    public SparkasseHannoverAssetChecker(AssetSourceCredentials credentials) {
+        super(credentials);
     }
 
     @Override

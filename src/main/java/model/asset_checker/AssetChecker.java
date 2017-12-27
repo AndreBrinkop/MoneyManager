@@ -1,5 +1,6 @@
-package model;
+package model.asset_checker;
 
+import model.ApiException;
 import model.asset.Account;
 import model.asset.AssetSource;
 import org.apache.http.client.CookieStore;

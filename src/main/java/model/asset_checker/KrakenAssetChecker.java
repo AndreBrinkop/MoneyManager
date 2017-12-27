@@ -1,9 +1,9 @@
-package asset_checker;
+package model.asset_checker;
 
 import edu.self.kraken.api.KrakenApi;
 import model.ApiException;
-import model.AssetChecker;
 import model.asset.Account;
+import model.asset.AssetSourceCredentials;
 import model.asset.CurrencyAccount;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -15,11 +15,11 @@ public class KrakenAssetChecker extends AssetChecker {
 
     private KrakenApi api;
 
-    public KrakenAssetChecker(String apiKey, String apiSecret) {
+    public KrakenAssetChecker(AssetSourceCredentials credentials) {
         super();
         this.api = new edu.self.kraken.api.KrakenApi();
-        this.api.setKey(apiKey);
-        this.api.setSecret(apiSecret);
+        this.api.setKey(credentials.getKey());
+        this.api.setSecret(credentials.getSecret());
     }
 
     public String getName() {

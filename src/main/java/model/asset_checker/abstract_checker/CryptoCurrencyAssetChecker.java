@@ -1,17 +1,19 @@
-package asset_checker.abstract_checker;
+package model.asset_checker.abstract_checker;
 
-import asset_checker.CoinbaseAssetChecker;
 import com.google.common.math.LongMath;
 import model.ApiException;
-import model.AssetChecker;
 import model.asset.Account;
+import model.asset.AssetSourceCredentials;
 import model.asset.CurrencyAccount;
+import model.asset_checker.AssetChecker;
+import model.asset_checker.CoinbaseAssetChecker;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class CryptoCurrencyAssetChecker extends AssetChecker {
 
@@ -23,14 +25,14 @@ public abstract class CryptoCurrencyAssetChecker extends AssetChecker {
 
     private List<String> addressList = new LinkedList<>();
 
-    public CryptoCurrencyAssetChecker(String address) {
+    public CryptoCurrencyAssetChecker(AssetSourceCredentials credentials) {
         super();
-        this.addressList.add(address);
+        this.addressList.add(credentials.getUser());
     }
 
-    public CryptoCurrencyAssetChecker(List<String> addressList) {
+    public CryptoCurrencyAssetChecker(List<AssetSourceCredentials> credentialsList) {
         super();
-        this.addressList.addAll(addressList);
+        this.addressList.addAll(credentialsList.stream().map(c -> c.getType()).collect(Collectors.toList()));
     }
 
     public List<Account> retrieveAccounts() throws ApiException {

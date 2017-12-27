@@ -1,8 +1,9 @@
-package asset_checker.abstract_checker;
+package model.asset_checker.abstract_checker;
 
 import model.ApiException;
-import model.AssetChecker;
 import model.asset.Account;
+import model.asset.AssetSourceCredentials;
+import model.asset_checker.AssetChecker;
 import org.apache.http.client.fluent.Executor;
 
 import java.util.List;
@@ -15,10 +16,10 @@ public abstract class HTTPAssetChecker extends AssetChecker {
 
     protected Executor executor;
 
-    public HTTPAssetChecker(String user, String password) {
+    public HTTPAssetChecker(AssetSourceCredentials credentials) {
         super();
-        this.user = user;
-        this.password = password;
+        this.user = credentials.getUser();
+        this.password = credentials.getKey();
         this.executor = getExecutor();
     }
 

@@ -1,10 +1,11 @@
-package asset_checker;
+package model.asset_checker;
 
-import asset_checker.abstract_checker.HTTPAssetChecker;
 import model.ApiException;
 import model.asset.Account;
+import model.asset.AssetSourceCredentials;
 import model.asset.Depot;
 import model.asset.DepotPosition;
+import model.asset_checker.abstract_checker.HTTPAssetChecker;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Content;
 import org.apache.http.client.fluent.Request;
@@ -22,8 +23,8 @@ import static java.util.Arrays.asList;
 public class EquatePlusAssetChecker extends HTTPAssetChecker {
 
 
-    public EquatePlusAssetChecker(String user, String password) {
-        super(user, password);
+    public EquatePlusAssetChecker(AssetSourceCredentials credentials) {
+        super(credentials);
     }
 
     @Override

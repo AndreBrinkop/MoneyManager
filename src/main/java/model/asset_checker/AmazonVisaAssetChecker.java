@@ -1,9 +1,10 @@
-package asset_checker;
+package model.asset_checker;
 
-import asset_checker.abstract_checker.HTTPAssetChecker;
 import model.ApiException;
 import model.asset.Account;
+import model.asset.AssetSourceCredentials;
 import model.asset.BasicAccount;
+import model.asset_checker.abstract_checker.HTTPAssetChecker;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Content;
 import org.apache.http.client.fluent.Request;
@@ -23,8 +24,8 @@ public class AmazonVisaAssetChecker extends HTTPAssetChecker {
     private String sessionTicket;
     private String logoutUrl;
 
-    public AmazonVisaAssetChecker(String user, String password) {
-        super(user, password);
+    public AmazonVisaAssetChecker(AssetSourceCredentials credentials) {
+        super(credentials);
     }
 
     @Override

@@ -1,7 +1,6 @@
-package asset_checker;
+package model.asset_checker;
 
 import model.ApiException;
-import model.AssetChecker;
 import model.asset.Account;
 import model.asset.BasicAccount;
 

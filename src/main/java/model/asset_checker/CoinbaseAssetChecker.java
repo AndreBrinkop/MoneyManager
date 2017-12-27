@@ -1,8 +1,8 @@
-package asset_checker;
+package model.asset_checker;
 
 import model.ApiException;
-import model.AssetChecker;
 import model.asset.Account;
+import model.asset.AssetSourceCredentials;
 import model.asset.BasicAccount;
 import model.asset.CurrencyAccount;
 import org.apache.http.client.HttpClient;
@@ -30,10 +30,10 @@ public class CoinbaseAssetChecker extends AssetChecker {
 
     private Executor executor;
 
-    public CoinbaseAssetChecker(String apiKey, String apiSecret) {
+    public CoinbaseAssetChecker(AssetSourceCredentials credentials) {
         super();
-        this.apiKey = apiKey;
-        this.apiSecret = apiSecret;
+        this.apiKey = credentials.getKey();
+        this.apiSecret = credentials.getSecret();
 
         HttpClient client = HttpClients.custom()
                 .setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build()).build();

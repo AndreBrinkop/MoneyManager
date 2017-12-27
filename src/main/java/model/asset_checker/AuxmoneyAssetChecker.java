@@ -1,9 +1,10 @@
-package asset_checker;
+package model.asset_checker;
 
-import asset_checker.abstract_checker.HTTPAssetChecker;
 import model.ApiException;
 import model.asset.Account;
+import model.asset.AssetSourceCredentials;
 import model.asset.BasicAccount;
+import model.asset_checker.abstract_checker.HTTPAssetChecker;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
@@ -21,8 +22,9 @@ import java.util.Optional;
 
 public class AuxmoneyAssetChecker extends HTTPAssetChecker {
 
-    public AuxmoneyAssetChecker(String user, String password) {
-        super(user, password);
+
+    public AuxmoneyAssetChecker(AssetSourceCredentials credentials) {
+        super(credentials);
     }
 
     @Override
