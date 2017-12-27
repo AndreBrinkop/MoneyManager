@@ -5,6 +5,7 @@ import model.asset.Account;
 import model.asset.AssetSourceCredentials;
 import model.asset.BasicAccount;
 import model.asset.CurrencyAccount;
+import model.asset_checker.abstract_checker.AssetChecker;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;

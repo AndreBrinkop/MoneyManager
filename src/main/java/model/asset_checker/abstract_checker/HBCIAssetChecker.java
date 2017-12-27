@@ -2,7 +2,6 @@ package model.asset_checker.abstract_checker;
 
 import model.ApiException;
 import model.asset.*;
-import model.asset_checker.AssetChecker;
 import org.apache.commons.lang.WordUtils;
 import org.kapott.hbci.GV.HBCIJob;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;

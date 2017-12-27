@@ -5,6 +5,7 @@ import model.ApiException;
 import model.asset.Account;
 import model.asset.AssetSourceCredentials;
 import model.asset.CurrencyAccount;
+import model.asset_checker.abstract_checker.AssetChecker;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

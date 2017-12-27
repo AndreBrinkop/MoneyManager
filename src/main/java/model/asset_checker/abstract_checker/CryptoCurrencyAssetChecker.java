@@ -5,7 +5,6 @@ import model.ApiException;
 import model.asset.Account;
 import model.asset.AssetSourceCredentials;
 import model.asset.CurrencyAccount;
-import model.asset_checker.AssetChecker;
 import model.asset_checker.CoinbaseAssetChecker;
 
 import java.math.BigDecimal;

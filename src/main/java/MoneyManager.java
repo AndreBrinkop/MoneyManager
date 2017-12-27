@@ -3,7 +3,7 @@ import model.ApiException;
 import model.asset.Account;
 import model.asset.AssetSource;
 import model.asset.AssetSourceCredentials;
-import model.asset_checker.*;
+import model.asset_checker.abstract_checker.AssetChecker;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static util.NumberHelper.roundValue;
 
@@ -32,44 +33,7 @@ public class MoneyManager {
     }
 
     private static List<AssetChecker> createAssetCheckers(List<AssetSourceCredentials> credentials) {
-        List<AssetChecker> assetCheckers = new LinkedList<>();
-        for (AssetSourceCredentials credentialsEntry : credentials) {
-            switch (credentialsEntry.getType()) {
-                case "SPARKASSE_HANNOVER":
-                    assetCheckers.add(new SparkasseHannoverAssetChecker(credentialsEntry));
-                    break;
-                case "ING_DIBA":
-                    assetCheckers.add(new INGDiBaAssetChecker(credentialsEntry));
-                    break;
-                case "AUXMONEY":
-                    assetCheckers.add(new AuxmoneyAssetChecker(credentialsEntry));
-                    break;
-                case "BITCOIN_DE":
-                    assetCheckers.add(new BitcoinDeAssetChecker(credentialsEntry));
-                    break;
-                case "KRAKEN":
-                    assetCheckers.add(new KrakenAssetChecker(credentialsEntry));
-                    break;
-                case "COINBASE":
-                    assetCheckers.add(new CoinbaseAssetChecker(credentialsEntry));
-                    break;
-                case "PAYPAL":
-                    assetCheckers.add(new PayPalAssetChecker(credentialsEntry));
-                    break;
-                case "AMAZON_VISA":
-                    assetCheckers.add(new AmazonVisaAssetChecker(credentialsEntry));
-                    break;
-                case "ETHEREUM":
-                    assetCheckers.add(new EthereumAssetChecker(credentialsEntry));
-                    break;
-                case "BITCOIN_CASH":
-                    assetCheckers.add(new BitcoinCashAssetChecker(credentialsEntry));
-                    break;
-                case "EQUATE_PLUS":
-                    assetCheckers.add(new EquatePlusAssetChecker(credentialsEntry));
-            }
-        }
-        return assetCheckers;
+        return credentials.stream().map(AssetChecker::createAssetChecker).collect(Collectors.toList());
     }
 
     public static String getEncryptionKey() throws IOException {

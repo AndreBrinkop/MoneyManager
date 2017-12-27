@@ -3,7 +3,6 @@ package model.asset_checker.abstract_checker;
 import model.ApiException;
 import model.asset.Account;
 import model.asset.AssetSourceCredentials;
-import model.asset_checker.AssetChecker;
 import org.apache.http.client.fluent.Executor;
 
 import java.util.List;
