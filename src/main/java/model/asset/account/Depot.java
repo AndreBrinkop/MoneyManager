@@ -20,18 +20,18 @@ public class Depot extends Account {
     }
 
     private BigDecimal getCurrentTotalEuroValue() {
-        return NumberHelper.roundValue(this.depotPositions.stream().map(DepotPosition::getEuroValue).reduce(BigDecimal.ZERO, BigDecimal::add));
+        return NumberHelper.roundValue(this.depotPositions.stream().map(DepotPosition::getCurrentEuroValue).reduce(BigDecimal.ZERO, BigDecimal::add));
     }
 
     public BigDecimal getTotalWinLoss() {
-        if (this.depotPositions.stream().filter(depotPosition -> depotPosition.getBuyValue() == null).findAny().isPresent()) {
+        if (this.depotPositions.stream().filter(depotPosition -> depotPosition.getCurrentBuyValue() == null).findAny().isPresent()) {
             return null;
         }
         return this.depotPositions.stream().map(DepotPosition::getTotalWinLoss).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public BigDecimal getTotalWinLossPercentage() {
-        if (this.depotPositions.stream().filter(depotPosition -> depotPosition.getBuyValue() == null).findAny().isPresent()) {
+        if (this.depotPositions.stream().filter(depotPosition -> depotPosition.getCurrentBuyValue() == null).findAny().isPresent()) {
             return null;
         }
         BigDecimal totalValue = getCurrentBalance().getBalanceValue();
