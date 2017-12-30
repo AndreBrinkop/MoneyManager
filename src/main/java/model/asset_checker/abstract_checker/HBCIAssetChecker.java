@@ -1,7 +1,11 @@
 package model.asset_checker.abstract_checker;
 
 import model.ApiException;
-import model.asset.*;
+import model.asset.AssetSourceCredentials;
+import model.asset.account.Account;
+import model.asset.account.BasicAccount;
+import model.asset.account.Depot;
+import model.asset.account.DepotPosition;
 import org.apache.commons.lang.WordUtils;
 import org.kapott.hbci.GV.HBCIJob;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;

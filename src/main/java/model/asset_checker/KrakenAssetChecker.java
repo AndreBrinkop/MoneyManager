@@ -2,15 +2,17 @@ package model.asset_checker;
 
 import edu.self.kraken.api.KrakenApi;
 import model.ApiException;
-import model.asset.Account;
 import model.asset.AssetSourceCredentials;
-import model.asset.CurrencyAccount;
+import model.asset.account.Account;
+import model.asset.account.BasicAccount;
+import model.asset.account.CurrencyAccount;
 import model.asset_checker.abstract_checker.AssetChecker;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class KrakenAssetChecker extends AssetChecker {
 
@@ -29,29 +31,34 @@ public class KrakenAssetChecker extends AssetChecker {
 
     public List<Account> retrieveAccounts() throws ApiException {
         Map<String, BigDecimal> assets = getAssetValues();
-        Map<String, BigDecimal> conversionRates = getConversionRatesToEur(assets.keySet());
+        Map<String, BigDecimal> conversionRates = getConversionRatesToEur(
+                assets.entrySet()
+                        .stream()
+                        .map(Map.Entry::getKey)
+                        .collect(Collectors.toSet())
+        );
         return createAssetObjects(assets, conversionRates);
     }
 
     private List<Account> createAssetObjects(Map<String, BigDecimal> assets, Map<String, BigDecimal> conversionRates) throws ApiException {
         List<Account> accountList = new LinkedList<>();
         assets.forEach((String currency, BigDecimal value) -> {
-            BigDecimal eurValue = getEurValue(currency, value, conversionRates);
-            accountList.add(new CurrencyAccount(getName(), currency, value, eurValue));
+            String currencyWithoutPrefix = currency.substring(1);
+            if ("EUR".equals(currencyWithoutPrefix)) {
+                accountList.add(new BasicAccount(getName(), value));
+            } else {
+                BigDecimal exchangeRate = conversionRates.get(currency);
+                accountList.add(new CurrencyAccount(getName(), currencyWithoutPrefix, value, exchangeRate));
+            }
         });
         return accountList;
     }
 
-    private BigDecimal getEurValue(String currency, BigDecimal value, Map<String, BigDecimal> conversionRates) {
-        if ("ZEUR".equals(currency)) {
-            return value;
-        }
-        BigDecimal conversionRate = conversionRates.get(currency);
-        return value.multiply(conversionRate);
-    }
-
     private Map<String, BigDecimal> getConversionRatesToEur(Set<String> currencies) throws ApiException {
         Map<String, BigDecimal> conversionRates = new HashMap<>();
+        conversionRates.put("ZEUR", BigDecimal.ONE);
+        currencies = currencies.stream().filter(currency -> !"ZEUR".equals(currency)).collect(Collectors.toSet());
+
         if (currencies.isEmpty()) {
             return conversionRates;
         }
@@ -60,10 +67,6 @@ public class KrakenAssetChecker extends AssetChecker {
             Map<String, String> input = new HashMap<>();
             StringBuilder pairs = new StringBuilder();
             for (String currency : currencies) {
-                if ("ZEUR".equals(currency)) {
-                    continue;
-                }
-
                 pairs.append(currency).append("ZEUR,");
             }
             pairs = new StringBuilder(pairs.substring(0, pairs.length() - 1));

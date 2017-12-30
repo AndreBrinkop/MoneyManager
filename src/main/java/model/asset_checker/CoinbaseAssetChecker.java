@@ -1,10 +1,10 @@
 package model.asset_checker;
 
 import model.ApiException;
-import model.asset.Account;
 import model.asset.AssetSourceCredentials;
-import model.asset.BasicAccount;
-import model.asset.CurrencyAccount;
+import model.asset.account.Account;
+import model.asset.account.BasicAccount;
+import model.asset.account.CurrencyAccount;
 import model.asset_checker.abstract_checker.AssetChecker;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.CookieSpecs;
@@ -85,7 +85,8 @@ public class CoinbaseAssetChecker extends AssetChecker {
                 if (amount.doubleValue() >= 0.0D) {
                     exchangeRate = retrieveExchangeRateToEuro(executor, currency);
                 }
-                accounts.add(new CurrencyAccount(name, currency, amount, amount.multiply(exchangeRate)));
+                accounts.add(new CurrencyAccount(name, currency, amount, exchangeRate));
+
             } else {
                 accounts.add(new BasicAccount(name, amount));
             }

@@ -1,9 +1,9 @@
 package model.asset_checker.abstract_checker;
 
 import model.ApiException;
-import model.asset.Account;
 import model.asset.AssetSource;
 import model.asset.AssetSourceCredentials;
+import model.asset.account.Account;
 import model.asset_checker.*;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;

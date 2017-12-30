@@ -2,9 +2,9 @@ package model.asset_checker.abstract_checker;
 
 import com.google.common.math.LongMath;
 import model.ApiException;
-import model.asset.Account;
 import model.asset.AssetSourceCredentials;
-import model.asset.CurrencyAccount;
+import model.asset.account.Account;
+import model.asset.account.CurrencyAccount;
 import model.asset_checker.CoinbaseAssetChecker;
 
 import java.math.BigDecimal;
@@ -49,12 +49,12 @@ public abstract class CryptoCurrencyAssetChecker extends AssetChecker {
         if (addressListBalances == null || addressListBalances.size() != this.addressList.size()) {
             for (String address : addressList) {
                 BigDecimal currencyValue = getAddressBalance(address);
-                accountList.add(new CurrencyAccount(address, getCurrency(), currencyValue, currencyValue.multiply(exchangeRateToEur)));
+                accountList.add(new CurrencyAccount(address, getCurrency(), currencyValue, exchangeRateToEur));
             }
         } else {
             for (int i = 0; i < this.addressList.size(); i++) {
                 BigDecimal currencyValue = addressListBalances.get(i);
-                accountList.add(new CurrencyAccount(this.addressList.get(i), getCurrency(), currencyValue, currencyValue.multiply(exchangeRateToEur)));
+                accountList.add(new CurrencyAccount(this.addressList.get(i), getCurrency(), currencyValue, exchangeRateToEur));
             }
         }
 

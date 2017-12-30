@@ -1,4 +1,4 @@
-package model.asset;
+package model.asset.account;
 
 import java.math.BigDecimal;
 import java.math.MathContext;

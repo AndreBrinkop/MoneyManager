@@ -1,9 +1,9 @@
 package model.asset_checker;
 
 import model.ApiException;
-import model.asset.Account;
 import model.asset.AssetSourceCredentials;
-import model.asset.BasicAccount;
+import model.asset.account.Account;
+import model.asset.account.BasicAccount;
 import model.asset_checker.abstract_checker.HTTPAssetChecker;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;

@@ -1,8 +1,8 @@
 package model.asset_checker;
 
 import model.ApiException;
-import model.asset.Account;
-import model.asset.BasicAccount;
+import model.asset.account.Account;
+import model.asset.account.BasicAccount;
 import model.asset_checker.abstract_checker.AssetChecker;
 
 import java.math.BigDecimal;

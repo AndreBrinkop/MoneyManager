@@ -1,5 +1,6 @@
-package model.asset;
+package model.asset.account;
 
+import model.asset.Balance;
 import util.NumberHelper;
 
 import java.math.BigDecimal;
@@ -15,10 +16,10 @@ public class Depot extends Account {
     public Depot(String name, List<DepotPosition> depotPositions) {
         super(name);
         this.depotPositions = depotPositions;
+        this.balances.add(new Balance(getCurrentTotalEuroValue()));
     }
 
-    @Override
-    public BigDecimal getTotalEurValue() {
+    private BigDecimal getCurrentTotalEuroValue() {
         return NumberHelper.roundValue(this.depotPositions.stream().map(DepotPosition::getEuroValue).reduce(BigDecimal.ZERO, BigDecimal::add));
     }
 
@@ -33,7 +34,7 @@ public class Depot extends Account {
         if (this.depotPositions.stream().filter(depotPosition -> depotPosition.getBuyValue() == null).findAny().isPresent()) {
             return null;
         }
-        BigDecimal totalValue = getTotalEurValue();
+        BigDecimal totalValue = getCurrentBalance().getBalanceValue();
         BigDecimal totalBuyValue = totalValue.subtract(getTotalWinLoss());
         return (totalValue.divide(totalBuyValue, MathContext.DECIMAL128).subtract(new BigDecimal(1))).multiply(new BigDecimal(100));
     }
@@ -41,7 +42,7 @@ public class Depot extends Account {
     @Override
     public String toString() {
         StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append(name + ": " + roundValue(getTotalEurValue()) + " €");
+        stringBuffer.append(name + ": " + roundValue(getCurrentBalance().getBalanceValue()) + " €");
         BigDecimal winLossPercentage = roundValue(getTotalWinLossPercentage());
         if (winLossPercentage != null) {
             stringBuffer.append(" (")

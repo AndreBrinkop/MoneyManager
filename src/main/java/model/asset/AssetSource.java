@@ -1,5 +1,7 @@
 package model.asset;
 
+import model.asset.account.Account;
+
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,7 +36,7 @@ public class AssetSource {
     }
 
     public BigDecimal getTotalEurValue() {
-        return this.accounts.stream().map(Account::getTotalEurValue).reduce(BigDecimal.ZERO, BigDecimal::add);
+        return this.accounts.stream().map(Account::getCurrentBalance).map(Balance::getEuroBalanceValue).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     @Override

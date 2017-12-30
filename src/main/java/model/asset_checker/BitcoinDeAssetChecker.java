@@ -1,9 +1,9 @@
 package model.asset_checker;
 
 import model.ApiException;
-import model.asset.Account;
 import model.asset.AssetSourceCredentials;
-import model.asset.CurrencyAccount;
+import model.asset.account.Account;
+import model.asset.account.CurrencyAccount;
 import model.asset_checker.abstract_checker.HTTPAssetChecker;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Content;
@@ -16,6 +16,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -159,12 +160,12 @@ public class BitcoinDeAssetChecker extends HTTPAssetChecker {
                     euroValueString = euroValueString.substring(0, euroValueString.length() - 2);
                 }
 
-                // First condition: Currency not yet supported by Bitcoin.de
+                // Check if currency supported by Bitcoin.de
                 if (!"---".equals(euroValueString) && !"-".equals(amountString)) {
                     BigDecimal amount = new BigDecimal(amountString);
                     BigDecimal euroValue = new BigDecimal(euroValueString);
                     if (amount.doubleValue() > 0.0) {
-                        accountList.add(new CurrencyAccount(getName(), currency, amount, euroValue));
+                        accountList.add(new CurrencyAccount(getName(), currency, amount, euroValue.divide(amount, MathContext.DECIMAL128)));
                     }
                 }
             }

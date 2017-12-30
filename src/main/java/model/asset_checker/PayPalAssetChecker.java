@@ -2,9 +2,9 @@ package model.asset_checker;
 
 import com.google.common.base.Splitter;
 import model.ApiException;
-import model.asset.Account;
 import model.asset.AssetSourceCredentials;
-import model.asset.BasicAccount;
+import model.asset.account.Account;
+import model.asset.account.BasicAccount;
 import model.asset_checker.abstract_checker.AssetChecker;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.CookieSpecs;

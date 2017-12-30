@@ -1,8 +1,8 @@
 import database.DatabaseConnection;
 import model.ApiException;
-import model.asset.Account;
 import model.asset.AssetSource;
 import model.asset.AssetSourceCredentials;
+import model.asset.account.Account;
 import model.asset_checker.abstract_checker.AssetChecker;
 
 import java.io.BufferedReader;
