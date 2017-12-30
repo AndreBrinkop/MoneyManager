@@ -47,7 +47,7 @@ public class CoinbaseAssetChecker extends AssetChecker {
     }
 
     @Override
-    protected List<Account> retrieveAccounts() throws ApiException {
+    public List<Account> retrieveAccounts() throws ApiException {
         try {
             // just the first 100 accounts are displayed; Pagination is not implemented yet
             String apiVersion = "2017-08-07";

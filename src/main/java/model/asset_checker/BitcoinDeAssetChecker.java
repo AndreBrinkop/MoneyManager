@@ -165,7 +165,7 @@ public class BitcoinDeAssetChecker extends HTTPAssetChecker {
                     BigDecimal amount = new BigDecimal(amountString);
                     BigDecimal euroValue = new BigDecimal(euroValueString);
                     if (amount.doubleValue() > 0.0) {
-                        accountList.add(new CurrencyAccount(getName(), currency, amount, euroValue.divide(amount, MathContext.DECIMAL128)));
+                        accountList.add(new CurrencyAccount(currency + " Wallet", currency, amount, euroValue.divide(amount, MathContext.DECIMAL128)));
                     }
                 }
             }

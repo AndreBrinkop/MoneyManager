@@ -23,6 +23,10 @@ public abstract class Account {
         return this.balances;
     }
 
+    public void updateBalance(Balance balance) {
+        this.balances.add(balance);
+    }
+
     public String getName() {
         return name;
     }

@@ -24,11 +24,46 @@ public class MoneyManager {
         List<AssetChecker> assetCheckers = createAssetCheckers(credentials);
 
         MoneyManager moneyManager = new MoneyManager();
-        BigDecimal totalAmount = moneyManager.retrieveAssets(assetCheckers, offlineAccounts);
+        List<AssetSource> assetSources = moneyManager.retrieveAssets(assetCheckers, offlineAccounts);
+        System.out.println();
 
+        printAssets(assetSources);
+
+        System.out.println();
+        System.out.println("New:");
+
+        for (AssetSource assetSource : assetSources) {
+            boolean done = false;
+            while (!done) {
+                System.out.println("Update assets from: " + assetSource.getName());
+                try {
+                    assetSource.updateAssets();
+                    done = true;
+                } catch (ApiException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        System.out.println();
+
+        printAssets(assetSources);
+
+        System.out.println();
+    }
+
+    private static void printAssets(List<AssetSource> assetSources) {
+        // TODO:
+        filterOutAssetSources(assetSources, "KlassikSparen");
+        filterOutAssetSources(assetSources, "BonusSparen");
+
+        for (AssetSource assetSource : assetSources) {
+            System.out.println(assetSource);
+        }
+
+        BigDecimal totalAmount = roundValue(assetSources.stream().map(AssetSource::getTotalEurValue).reduce(BigDecimal.ZERO, BigDecimal::add));
         System.out.println("--------------------");
         //System.out.println("Old Total: " + oldTotalAmount + " €");
-        System.out.println("New Total: " + totalAmount + " €");
+        System.out.println("Total: " + totalAmount + " €");
         //System.out.println("\t\t\t" + (delta.doubleValue() > 0.0 ? "+" : "") + delta + " €");
     }
 
@@ -48,7 +83,7 @@ public class MoneyManager {
         return encryptionKey;
     }
 
-    private BigDecimal retrieveAssets(List<AssetChecker> assetCheckers, AssetSource offlineAccounts) throws IOException {
+    private List<AssetSource> retrieveAssets(List<AssetChecker> assetCheckers, AssetSource offlineAccounts) throws IOException {
         List<AssetSource> assetSourceList = new LinkedList<>();
 
         for (AssetChecker checker : assetCheckers) {
@@ -56,7 +91,7 @@ public class MoneyManager {
             while (!done) {
                 System.out.println("Retrieving assets from: " + checker.getName());
                 try {
-                    assetSourceList.add(checker.retrieveAssets());
+                    assetSourceList.add(new AssetSource(checker));
                     done = true;
                 } catch (ApiException e) {
                     e.printStackTrace();
@@ -64,21 +99,10 @@ public class MoneyManager {
             }
         }
         assetSourceList.add(offlineAccounts);
-
-        System.out.println();
-
-        filterOutAssetSources(assetSourceList, "KlassikSparen");
-        filterOutAssetSources(assetSourceList, "BonusSparen");
-
-        for (AssetSource assetSource : assetSourceList) {
-            System.out.println(assetSource);
-        }
-
-        BigDecimal totalAmount = roundValue(assetSourceList.stream().map(AssetSource::getTotalEurValue).reduce(BigDecimal.ZERO, BigDecimal::add));
-        return totalAmount;
+        return assetSourceList;
     }
 
-    private void filterOutAssetSources(List<AssetSource> assetSourceList, String accountNamePart) {
+    private static void filterOutAssetSources(List<AssetSource> assetSourceList, String accountNamePart) {
         for (AssetSource assetSource : assetSourceList) {
             if (assetSource == null || assetSource.getAccounts() == null) {
                 continue;

@@ -102,7 +102,7 @@ public class EquatePlusAssetChecker extends HTTPAssetChecker {
 
     protected void login() throws ApiException {
         String equateLoginUrl = "https://www.equateplus.com/EquatePlusParticipant/?login";
-        executor.clearCookies();
+        executor = getExecutor();
         try {
             executor.execute(Request.Get(equateLoginUrl));
 

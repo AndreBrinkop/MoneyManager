@@ -44,11 +44,12 @@ public class KrakenAssetChecker extends AssetChecker {
         List<Account> accountList = new LinkedList<>();
         assets.forEach((String currency, BigDecimal value) -> {
             String currencyWithoutPrefix = currency.substring(1);
+            String walletName = currencyWithoutPrefix + " Wallet";
             if ("EUR".equals(currencyWithoutPrefix)) {
-                accountList.add(new BasicAccount(getName(), value));
+                accountList.add(new BasicAccount(walletName, value));
             } else {
                 BigDecimal exchangeRate = conversionRates.get(currency);
-                accountList.add(new CurrencyAccount(getName(), currencyWithoutPrefix, value, exchangeRate));
+                accountList.add(new CurrencyAccount(walletName, currencyWithoutPrefix, value, exchangeRate));
             }
         });
         return accountList;
