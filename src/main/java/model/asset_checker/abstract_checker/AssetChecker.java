@@ -2,7 +2,6 @@ package model.asset_checker.abstract_checker;
 
 import model.ApiException;
 import model.asset.AssetSourceCredentials;
-import model.asset.Balance;
 import model.asset.account.Account;
 import model.asset_checker.*;
 import org.apache.http.client.CookieStore;
@@ -11,7 +10,6 @@ import org.apache.http.client.fluent.Executor;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.HttpClientBuilder;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +25,7 @@ public abstract class AssetChecker {
             int accountIndex = accounts.stream().map(account -> account.getName()).collect(Collectors.toList()).indexOf(currentAccount.getName());
             if (accountIndex > -1) {
                 // account already existed
-                accounts.get(accountIndex).updateBalance(currentAccount.getCurrentBalance());
+                accounts.get(accountIndex).updateBalance(currentAccount);
             } else {
                 // add new account
                 accounts.add(currentAccount);
@@ -37,7 +35,7 @@ public abstract class AssetChecker {
         for (Account account : accounts) {
             // account was closed
             if (!currentAccounts.stream().map(currentAccount -> currentAccount.getName()).collect(Collectors.toList()).contains(account.getName())) {
-                account.updateBalance(new Balance(BigDecimal.ZERO));
+                account.updateBalance(null);
             }
         }
         return accounts;

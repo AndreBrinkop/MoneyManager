@@ -2,6 +2,7 @@ package model.asset.account;
 
 import model.asset.Balance;
 
+import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,8 +24,12 @@ public abstract class Account {
         return this.balances;
     }
 
-    public void updateBalance(Balance balance) {
-        this.balances.add(balance);
+    public void updateBalance(Account account) {
+        if (account == null) {
+            this.balances.add(new Balance(BigDecimal.ZERO));
+        } else {
+            this.balances.add(account.getCurrentBalance());
+        }
     }
 
     public String getName() {

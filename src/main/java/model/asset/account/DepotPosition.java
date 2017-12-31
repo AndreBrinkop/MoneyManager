@@ -56,6 +56,18 @@ public class DepotPosition {
         return (getCurrentDepotPositionBalance().getPricePerUnit().subtract(getCurrentDepotPositionBalance().getBuyValue())).multiply(getCurrentDepotPositionBalance().getAmount());
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getIsin() {
+        return isin;
+    }
+
+    public String getWkn() {
+        return wkn;
+    }
+
     @Override
     public String toString() {
         StringBuffer stringBuffer = new StringBuffer().append(getCurrentDepotPositionBalance().getAmount() + " " + name + ": " + roundValue(getCurrentEuroValue()) + " €");
@@ -69,5 +81,13 @@ public class DepotPosition {
         }
 
         return stringBuffer.toString();
+    }
+
+    public void updatePosition(DepotPosition currentDepotPosition) {
+        if (currentDepotPosition == null) {
+            this.positionBalanceList.add(new DepotPositionBalance(BigDecimal.ZERO, BigDecimal.ZERO));
+        } else {
+            this.positionBalanceList.add(currentDepotPosition.getCurrentDepotPositionBalance());
+        }
     }
 }
