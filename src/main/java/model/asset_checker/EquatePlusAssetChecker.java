@@ -22,7 +22,6 @@ import static java.util.Arrays.asList;
 
 public class EquatePlusAssetChecker extends HTTPAssetChecker {
 
-
     public EquatePlusAssetChecker(AssetSourceCredentials credentials) {
         super(credentials);
     }
@@ -107,15 +106,15 @@ public class EquatePlusAssetChecker extends HTTPAssetChecker {
             executor.execute(Request.Get(equateLoginUrl));
 
             Response response = executor.execute(Request.Post(equateLoginUrl).bodyForm(
-                    new BasicNameValuePair("isiwebuserid", user),
+                    new BasicNameValuePair("isiwebuserid", credentials.getUser()),
                     new BasicNameValuePair("result", "Continue Login")
             ));
             HttpResponse httpResponse = response.returnResponse();
             // System.out.println("httpResponse = " + httpResponse);
 
             response = executor.execute(Request.Post(equateLoginUrl).bodyForm(
-                    new BasicNameValuePair("isiwebuserid", user),
-                    new BasicNameValuePair("isiwebpasswd", password),
+                    new BasicNameValuePair("isiwebuserid", credentials.getUser()),
+                    new BasicNameValuePair("isiwebpasswd", credentials.getKey()),
                     new BasicNameValuePair("result", "Continue")
             ));
             httpResponse = response.returnResponse();

@@ -24,15 +24,8 @@ import java.util.Map;
 
 public class PayPalAssetChecker extends AssetChecker {
 
-    private String apiUser;
-    private String apiKey;
-    private String apiSignature;
-
     public PayPalAssetChecker(AssetSourceCredentials credentials) {
-        super();
-        this.apiUser = credentials.getUser();
-        this.apiKey = credentials.getKey();
-        this.apiSignature = credentials.getSecret();
+        super(credentials);
     }
 
     @Override
@@ -50,9 +43,9 @@ public class PayPalAssetChecker extends AssetChecker {
         URIBuilder builder = new URIBuilder();
         builder.setScheme("https").setHost("api-3t.paypal.com").setPath("/nvp")
                 .setParameter("METHOD", "GetBalance")
-                .setParameter("USER", apiUser)
-                .setParameter("PWD", apiKey)
-                .setParameter("SIGNATURE", apiSignature)
+                .setParameter("USER", credentials.getUser())
+                .setParameter("PWD", credentials.getKey())
+                .setParameter("SIGNATURE", credentials.getSecret())
                 .setParameter("VERSION", "1.2.0")
                 .setParameter("RETURNALLCURRENCIES", "1");
         try {

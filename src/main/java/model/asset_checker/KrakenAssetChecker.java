@@ -19,7 +19,7 @@ public class KrakenAssetChecker extends AssetChecker {
     private KrakenApi api;
 
     public KrakenAssetChecker(AssetSourceCredentials credentials) {
-        super();
+        super(null);
         this.api = new edu.self.kraken.api.KrakenApi();
         this.api.setKey(credentials.getKey());
         this.api.setSecret(credentials.getSecret());

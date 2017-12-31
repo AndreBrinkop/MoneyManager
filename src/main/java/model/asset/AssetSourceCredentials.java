@@ -2,27 +2,27 @@ package model.asset;
 
 public class AssetSourceCredentials {
 
-    private final String type;
-    private final String user;
+    private final char[] type;
+    private final char[] user;
 
-    private final String key;
-    private final String secret;
+    private final char[] key;
+    private final char[] secret;
 
-    public AssetSourceCredentials(String type, String user, String key, String secret) {
+    public AssetSourceCredentials(char[] type, char[] user, char[] key, char[] secret) {
         this.type = type;
         this.user = user;
         this.key = key;
         this.secret = secret;
     }
 
-    public AssetSourceCredentials(String type, String user, String key) {
+    public AssetSourceCredentials(char[] type, char[] user, char[] key) {
         this.type = type;
         this.user = user;
         this.key = key;
         this.secret = null;
     }
 
-    public AssetSourceCredentials(String type, String user) {
+    public AssetSourceCredentials(char[] type, char[] user) {
         this.type = type;
         this.user = user;
         this.key = null;
@@ -30,18 +30,18 @@ public class AssetSourceCredentials {
     }
 
     public String getType() {
-        return type;
+        return new String(type);
     }
 
     public String getUser() {
-        return user;
+        return new String(user);
     }
 
     public String getKey() {
-        return key;
+        return new String(key);
     }
 
     public String getSecret() {
-        return secret;
+        return new String(secret);
     }
 }

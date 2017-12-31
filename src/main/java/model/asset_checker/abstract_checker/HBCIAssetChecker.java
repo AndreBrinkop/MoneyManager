@@ -29,12 +29,8 @@ import java.util.Properties;
 
 public abstract class HBCIAssetChecker extends AssetChecker {
 
-    protected String user;
-    protected String password;
-
     public HBCIAssetChecker(AssetSourceCredentials credentials) {
-        this.user = credentials.getUser();
-        this.password = credentials.getKey();
+        super(credentials);
     }
 
     public abstract String getName();
@@ -46,8 +42,8 @@ public abstract class HBCIAssetChecker extends AssetChecker {
         passport = fillPassport(passport);
         passport.setHBCIVersion("300");
         passport.setFilterType("Base64");
-        passport.setUserId(user);
-        passport.setPIN(password);
+        passport.setUserId(credentials.getUser());
+        passport.setPIN(credentials.getKey());
         passport.setPort(new Integer(443));
         passport.setCountry("DE");
         return passport;

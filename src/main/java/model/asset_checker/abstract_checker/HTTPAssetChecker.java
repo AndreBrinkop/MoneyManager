@@ -10,15 +10,10 @@ import java.util.List;
 
 public abstract class HTTPAssetChecker extends AssetChecker {
 
-    protected String user;
-    protected String password;
-
     protected Executor executor;
 
     public HTTPAssetChecker(AssetSourceCredentials credentials) {
-        super();
-        this.user = credentials.getUser();
-        this.password = credentials.getKey();
+        super(credentials);
         this.executor = getExecutor();
     }
 

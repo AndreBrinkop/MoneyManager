@@ -53,8 +53,8 @@ public class BitcoinDeAssetChecker extends HTTPAssetChecker {
 
             response = executor.execute(Request.Post(bitcoinDeLoginUrl).bodyForm(
                     new BasicNameValuePair("login[_csrf_token]", csrfToken),
-                    new BasicNameValuePair("login[username]", user),
-                    new BasicNameValuePair("login[password]", password),
+                    new BasicNameValuePair("login[username]", credentials.getUser()),
+                    new BasicNameValuePair("login[password]", credentials.getKey()),
                     new BasicNameValuePair("b_redirect_to_dashboard", "1"),
                     new BasicNameValuePair("s_redirect_url", redirectUrl),
                     new BasicNameValuePair("submit", "Anmelden")

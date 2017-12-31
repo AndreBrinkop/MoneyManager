@@ -26,16 +26,10 @@ import static util.CryptoHelper.hmacSHA256;
 
 public class CoinbaseAssetChecker extends AssetChecker {
 
-    private String apiKey;
-    private String apiSecret;
-
     private Executor executor;
 
     public CoinbaseAssetChecker(AssetSourceCredentials credentials) {
-        super();
-        this.apiKey = credentials.getKey();
-        this.apiSecret = credentials.getSecret();
-
+        super(credentials);
         HttpClient client = HttpClients.custom()
                 .setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build()).build();
         executor = Executor.newInstance(client);
@@ -57,8 +51,8 @@ public class CoinbaseAssetChecker extends AssetChecker {
             String preHashSignature = timeStamp + "GET" + path;
             Response response = executor.execute(Request.Get(url)
                     .addHeader("CB-VERSION", apiVersion)
-                    .addHeader("CB-ACCESS-KEY", apiKey)
-                    .addHeader("CB-ACCESS-SIGN", hmacSHA256(preHashSignature, apiSecret))
+                    .addHeader("CB-ACCESS-KEY", credentials.getKey())
+                    .addHeader("CB-ACCESS-SIGN", hmacSHA256(preHashSignature, credentials.getSecret()))
                     .addHeader("CB-ACCESS-TIMESTAMP", timeStamp));
 
             Content content = response.returnContent();

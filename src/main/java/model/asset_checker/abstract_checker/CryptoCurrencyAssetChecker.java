@@ -25,12 +25,12 @@ public abstract class CryptoCurrencyAssetChecker extends AssetChecker {
     private List<String> addressList = new LinkedList<>();
 
     public CryptoCurrencyAssetChecker(AssetSourceCredentials credentials) {
-        super();
+        super(null);
         this.addressList.add(credentials.getUser());
     }
 
     public CryptoCurrencyAssetChecker(List<AssetSourceCredentials> credentialsList) {
-        super();
+        super(null);
         this.addressList.addAll(credentialsList.stream().map(c -> c.getType()).collect(Collectors.toList()));
     }
 

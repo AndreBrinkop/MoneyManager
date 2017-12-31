@@ -84,8 +84,8 @@ public class AuxmoneyAssetChecker extends HTTPAssetChecker {
 
             String auxmoneyLoginCheckUrl = "https://www.auxmoney.com/login_check";
             Response response = executor.execute(Request.Post(auxmoneyLoginCheckUrl).bodyForm(
-                    new BasicNameValuePair("login[loginUsername]", user),
-                    new BasicNameValuePair("login[loginPassword]", password),
+                    new BasicNameValuePair("login[loginUsername]", credentials.getUser()),
+                    new BasicNameValuePair("login[loginPassword]", credentials.getKey()),
                     new BasicNameValuePair("login[token]", loginToken)
             ));
             HttpResponse httpResponse = response.returnResponse();

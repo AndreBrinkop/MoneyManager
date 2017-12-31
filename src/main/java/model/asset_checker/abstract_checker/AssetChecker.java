@@ -17,6 +17,12 @@ public abstract class AssetChecker {
 
     public abstract String getName();
 
+    protected final AssetSourceCredentials credentials;
+
+    public AssetChecker(AssetSourceCredentials credentials) {
+        this.credentials = credentials;
+    }
+
     public abstract List<Account> retrieveAccounts() throws ApiException;
 
     public List<Account> updateAssets(List<Account> accounts) throws ApiException {
@@ -50,7 +56,7 @@ public abstract class AssetChecker {
     }
 
     public static AssetChecker createAssetChecker(AssetSourceCredentials assetSourceCredentials) {
-        switch (assetSourceCredentials.getType()) {
+        switch (new String(assetSourceCredentials.getType())) {
             case "SPARKASSE_HANNOVER":
                 return new SparkasseHannoverAssetChecker(assetSourceCredentials);
             case "ING_DIBA":

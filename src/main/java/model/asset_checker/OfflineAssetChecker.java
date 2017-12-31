@@ -12,6 +12,7 @@ public class OfflineAssetChecker extends AssetChecker {
     private String name;
 
     public OfflineAssetChecker(String name, List<Account> accounts) {
+        super(null);
         this.name = name;
         this.accountList = accounts;
     }
