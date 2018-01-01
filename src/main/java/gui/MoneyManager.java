@@ -1,3 +1,5 @@
+package gui;
+
 import database.DatabaseConnection;
 import model.ApiException;
 import model.asset.AssetSource;
@@ -16,7 +18,7 @@ import static util.NumberHelper.roundValue;
 public class MoneyManager {
 
     public static void main(String[] args) throws Exception {
-        DatabaseConnection databaseConnection = new DatabaseConnection(getEncryptionKey());
+        DatabaseConnection databaseConnection = new DatabaseConnection(getEncryptionKeyFromConsoleInput());
         List<AssetSourceCredentials> credentials = databaseConnection.getAssetSourceCredentials();
         AssetSource offlineAccounts = databaseConnection.getOfflineAccountAssetSource();
 
@@ -65,7 +67,7 @@ public class MoneyManager {
         //System.out.println("\t\t\t" + (delta.doubleValue() > 0.0 ? "+" : "") + delta + " €");
     }
 
-    public static String getEncryptionKey() throws IOException {
+    public static String getEncryptionKeyFromConsoleInput() throws IOException {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
         String encryptionKey = null;
         while (encryptionKey == null || encryptionKey.isEmpty()) {
@@ -77,7 +79,7 @@ public class MoneyManager {
         return encryptionKey;
     }
 
-    private List<AssetSource> retrieveAssets(List<AssetSourceCredentials> credentialsList, AssetSource offlineAccounts) throws IOException {
+    public static List<AssetSource> retrieveAssets(List<AssetSourceCredentials> credentialsList, AssetSource offlineAccounts) throws IOException {
         List<AssetSource> assetSourceList = new LinkedList<>();
 
         for (int i = 0; i < credentialsList.size(); i++) {
