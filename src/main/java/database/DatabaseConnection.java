@@ -87,7 +87,7 @@ public class DatabaseConnection {
     public void addOfflineAccount(Account account) throws SQLException {
         PreparedStatement preparedStatement = this.databaseConnection.prepareStatement("INSERT INTO OfflineAccounts(Name, Balance) VALUES(?, ?);");
         preparedStatement.setString(OFFLINE_ACCOUNTS_COLUMN_NAME, account.getName());
-        preparedStatement.setBigDecimal(OFFLINE_ACCOUNTS_COLUMN_BALANCE, account.getCurrentBalance().getBalanceValue());
+        preparedStatement.setBigDecimal(OFFLINE_ACCOUNTS_COLUMN_BALANCE, account.getCurrentEurBalance().getBalanceValue());
         preparedStatement.execute();
     }
 

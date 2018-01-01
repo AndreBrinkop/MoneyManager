@@ -60,7 +60,7 @@ public class MoneyManager {
             System.out.println(assetSource);
         }
 
-        BigDecimal totalAmount = roundValue(assetSources.stream().map(AssetSource::getTotalEurValue).reduce(BigDecimal.ZERO, BigDecimal::add));
+        BigDecimal totalAmount = roundValue(assetSources.stream().map(assetSource -> assetSource.getCurrentEurBalance().getEuroBalanceValue()).reduce(BigDecimal.ZERO, BigDecimal::add));
         System.out.println("--------------------");
         //System.out.println("Old Total: " + oldTotalAmount + " €");
         System.out.println("Total: " + totalAmount + " €");

@@ -22,8 +22,8 @@ public class CurrencyAccount extends Account {
 
     @Override
     public String toString() {
-        Balance balance = getCurrentBalance();
-        return name + ": " + getCurrentBalance().getBalanceValue().stripTrailingZeros() + " " + currency + ": " + roundValue(getCurrentBalance().getEuroBalanceValue()) + " €";
+        Balance balance = getCurrentEurBalance();
+        return name + ": " + getCurrentEurBalance().getBalanceValue().stripTrailingZeros() + " " + currency + ": " + roundValue(getCurrentEurBalance().getEuroBalanceValue()) + " €";
     }
 
 }

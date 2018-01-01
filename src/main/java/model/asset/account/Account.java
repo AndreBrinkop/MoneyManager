@@ -1,5 +1,6 @@
 package model.asset.account;
 
+import model.asset.AssetObject;
 import model.asset.Balance;
 
 import java.math.BigDecimal;
@@ -7,7 +8,7 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class Account {
+public abstract class Account implements AssetObject {
 
     String name;
     protected List<Balance> balances = new LinkedList<>();
@@ -16,7 +17,7 @@ public abstract class Account {
         this.name = name;
     }
 
-    public Balance getCurrentBalance() {
+    public Balance getCurrentEurBalance() {
         return this.balances.stream().max(Comparator.comparing(Balance::getTimestamp)).orElse(null);
     }
 
@@ -28,7 +29,7 @@ public abstract class Account {
         if (account == null) {
             this.balances.add(new Balance(BigDecimal.ZERO));
         } else {
-            this.balances.add(account.getCurrentBalance());
+            this.balances.add(account.getCurrentEurBalance());
         }
     }
 

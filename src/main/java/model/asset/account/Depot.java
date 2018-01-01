@@ -62,7 +62,7 @@ public class Depot extends Account {
         if (this.depotPositions.stream().filter(depotPosition -> depotPosition.getCurrentBuyValue() == null).findAny().isPresent()) {
             return null;
         }
-        BigDecimal totalValue = getCurrentBalance().getBalanceValue();
+        BigDecimal totalValue = getCurrentEurBalance().getBalanceValue();
         BigDecimal totalBuyValue = totalValue.subtract(getTotalWinLoss());
         return (totalValue.divide(totalBuyValue, MathContext.DECIMAL128).subtract(new BigDecimal(1))).multiply(new BigDecimal(100));
     }
@@ -74,7 +74,7 @@ public class Depot extends Account {
     @Override
     public String toString() {
         StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append(name + ": " + roundValue(getCurrentBalance().getBalanceValue()) + " €");
+        stringBuffer.append(name + ": " + roundValue(getCurrentEurBalance().getBalanceValue()) + " €");
         BigDecimal winLossPercentage = roundValue(getTotalWinLossPercentage());
         if (winLossPercentage != null) {
             stringBuffer.append(" (")

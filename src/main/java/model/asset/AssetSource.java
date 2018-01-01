@@ -10,7 +10,7 @@ import java.util.List;
 
 import static util.NumberHelper.roundValue;
 
-public class AssetSource {
+public class AssetSource implements AssetObject {
 
     private String name;
     private List<Account> accounts;
@@ -35,8 +35,8 @@ public class AssetSource {
         this.accounts.remove(account);
     }
 
-    public BigDecimal getTotalEurValue() {
-        return this.accounts.stream().map(Account::getCurrentBalance).map(Balance::getEuroBalanceValue).reduce(BigDecimal.ZERO, BigDecimal::add);
+    public Balance getCurrentEurBalance() {
+        return new Balance(this.accounts.stream().map(Account::getCurrentEurBalance).map(Balance::getEuroBalanceValue).reduce(BigDecimal.ZERO, BigDecimal::add));
     }
 
     public void updateAssets(AssetSourceCredentials credentials) throws ApiException {
@@ -55,7 +55,7 @@ public class AssetSource {
     public String toString() {
         StringBuffer stringBuffer = new StringBuffer();
 
-        BigDecimal totalEurValue = getTotalEurValue();
+        BigDecimal totalEurValue = getCurrentEurBalance().getEuroBalanceValue();
         stringBuffer.append(name).append(": ").append(roundValue(totalEurValue)).append(" €\n");
         this.accounts.stream().forEach(account -> stringBuffer.append("\t").append(account.toString()).append("\n"));
         return stringBuffer.toString();
