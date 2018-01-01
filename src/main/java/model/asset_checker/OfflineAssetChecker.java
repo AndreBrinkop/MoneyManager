@@ -1,6 +1,7 @@
 package model.asset_checker;
 
 import model.ApiException;
+import model.asset.AssetSourceCredentials;
 import model.asset.account.Account;
 import model.asset_checker.abstract_checker.AssetChecker;
 
@@ -12,7 +13,6 @@ public class OfflineAssetChecker extends AssetChecker {
     private String name;
 
     public OfflineAssetChecker(String name, List<Account> accounts) {
-        super(null);
         this.name = name;
         this.accountList = accounts;
     }
@@ -21,7 +21,8 @@ public class OfflineAssetChecker extends AssetChecker {
         return name;
     }
 
-    public List<Account> retrieveAccounts() throws ApiException {
+    @Override
+    public List<Account> retrieveAccounts(AssetSourceCredentials credentials) throws ApiException {
         return accountList;
     }
 }

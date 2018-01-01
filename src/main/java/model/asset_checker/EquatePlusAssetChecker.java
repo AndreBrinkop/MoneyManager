@@ -22,10 +22,6 @@ import static java.util.Arrays.asList;
 
 public class EquatePlusAssetChecker extends HTTPAssetChecker {
 
-    public EquatePlusAssetChecker(AssetSourceCredentials credentials) {
-        super(credentials);
-    }
-
     @Override
     public String getName() {
         return "EquatePlus";
@@ -99,7 +95,7 @@ public class EquatePlusAssetChecker extends HTTPAssetChecker {
         return sharePrices;
     }
 
-    protected void login() throws ApiException {
+    protected void login(AssetSourceCredentials credentials) throws ApiException {
         String equateLoginUrl = "https://www.equateplus.com/EquatePlusParticipant/?login";
         executor = getExecutor();
         try {

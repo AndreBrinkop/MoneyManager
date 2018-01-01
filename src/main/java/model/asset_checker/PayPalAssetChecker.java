@@ -24,17 +24,13 @@ import java.util.Map;
 
 public class PayPalAssetChecker extends AssetChecker {
 
-    public PayPalAssetChecker(AssetSourceCredentials credentials) {
-        super(credentials);
-    }
-
     @Override
     public String getName() {
         return "PayPal";
     }
 
     @Override
-    public List<Account> retrieveAccounts() throws ApiException {
+    public List<Account> retrieveAccounts(AssetSourceCredentials credentials) throws ApiException {
 
         HttpClient client = HttpClients.custom()
                 .setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build()).build();

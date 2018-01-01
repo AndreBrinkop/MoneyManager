@@ -13,7 +13,7 @@ public class BasicAccount extends Account {
 
     @Override
     public String toString() {
-        return this.name + ": " + getCurrentBalance().getBalanceValue().stripTrailingZeros() + " €";
+        return this.name + ": " + getCurrentBalance().getBalanceValue().stripTrailingZeros().toPlainString() + " €";
     }
 }
 

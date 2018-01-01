@@ -3,7 +3,6 @@ import model.ApiException;
 import model.asset.AssetSource;
 import model.asset.AssetSourceCredentials;
 import model.asset.account.Account;
-import model.asset_checker.abstract_checker.AssetChecker;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,7 +10,6 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static util.NumberHelper.roundValue;
 
@@ -21,10 +19,9 @@ public class MoneyManager {
         DatabaseConnection databaseConnection = new DatabaseConnection(getEncryptionKey());
         List<AssetSourceCredentials> credentials = databaseConnection.getAssetSourceCredentials();
         AssetSource offlineAccounts = databaseConnection.getOfflineAccountAssetSource();
-        List<AssetChecker> assetCheckers = createAssetCheckers(credentials);
 
         MoneyManager moneyManager = new MoneyManager();
-        List<AssetSource> assetSources = moneyManager.retrieveAssets(assetCheckers, offlineAccounts);
+        List<AssetSource> assetSources = moneyManager.retrieveAssets(credentials, offlineAccounts);
         System.out.println();
 
         printAssets(assetSources);
@@ -32,12 +29,13 @@ public class MoneyManager {
         System.out.println();
         System.out.println("New:");
 
-        for (AssetSource assetSource : assetSources) {
+        for (int i = 0; i < assetSources.size(); i++) {
+            AssetSource assetSource = assetSources.get(i);
             boolean done = false;
             while (!done) {
                 System.out.println("Update assets from: " + assetSource.getName());
                 try {
-                    assetSource.updateAssets();
+                    assetSource.updateAssets(credentials.size() > i ? credentials.get(i) : null);
                     done = true;
                 } catch (ApiException e) {
                     e.printStackTrace();
@@ -67,10 +65,6 @@ public class MoneyManager {
         //System.out.println("\t\t\t" + (delta.doubleValue() > 0.0 ? "+" : "") + delta + " €");
     }
 
-    private static List<AssetChecker> createAssetCheckers(List<AssetSourceCredentials> credentials) {
-        return credentials.stream().map(AssetChecker::createAssetChecker).collect(Collectors.toList());
-    }
-
     public static String getEncryptionKey() throws IOException {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
         String encryptionKey = null;
@@ -83,20 +77,28 @@ public class MoneyManager {
         return encryptionKey;
     }
 
-    private List<AssetSource> retrieveAssets(List<AssetChecker> assetCheckers, AssetSource offlineAccounts) throws IOException {
+    private List<AssetSource> retrieveAssets(List<AssetSourceCredentials> credentialsList, AssetSource offlineAccounts) throws IOException {
         List<AssetSource> assetSourceList = new LinkedList<>();
 
-        for (AssetChecker checker : assetCheckers) {
+        for (int i = 0; i < credentialsList.size(); i++) {
+            AssetSourceCredentials credentials = credentialsList.get(i);
             boolean done = false;
             while (!done) {
-                System.out.println("Retrieving assets from: " + checker.getName());
+                AssetSource assetSource = new AssetSource(credentials);
+                System.out.println("Retrieving assets from: " + assetSource.getName());
                 try {
-                    assetSourceList.add(new AssetSource(checker));
+                    assetSource.updateAssets(credentialsList.get(i));
+                    assetSourceList.add(assetSource);
                     done = true;
                 } catch (ApiException e) {
                     e.printStackTrace();
                 }
             }
+        }
+        try {
+            offlineAccounts.updateAssets(null);
+        } catch (ApiException e) {
+            e.printStackTrace();
         }
         assetSourceList.add(offlineAccounts);
         return assetSourceList;

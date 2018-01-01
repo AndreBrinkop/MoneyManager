@@ -1,7 +1,6 @@
 package model.asset_checker;
 
 import model.ApiException;
-import model.asset.AssetSourceCredentials;
 import model.asset_checker.abstract_checker.CryptoCurrencyAssetChecker;
 import org.apache.http.client.fluent.Content;
 import org.apache.http.client.fluent.Executor;
@@ -12,14 +11,6 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class BitcoinAssetChecker extends CryptoCurrencyAssetChecker {
-
-    public BitcoinAssetChecker(AssetSourceCredentials credentials) {
-        super(credentials);
-    }
-
-    public BitcoinAssetChecker(List<AssetSourceCredentials> credentialsList) {
-        super(credentialsList);
-    }
 
     @Override
     protected int getSmallestUnitExponent() {

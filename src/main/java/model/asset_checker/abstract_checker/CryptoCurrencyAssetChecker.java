@@ -12,7 +12,8 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static java.util.Arrays.asList;
 
 public abstract class CryptoCurrencyAssetChecker extends AssetChecker {
 
@@ -24,17 +25,18 @@ public abstract class CryptoCurrencyAssetChecker extends AssetChecker {
 
     private List<String> addressList = new LinkedList<>();
 
-    public CryptoCurrencyAssetChecker(AssetSourceCredentials credentials) {
-        super(null);
-        this.addressList.add(credentials.getUser());
+    @Override
+    public List<Account> retrieveAccounts(AssetSourceCredentials credentials) throws ApiException {
+        return retrieveAccounts(asList(credentials));
     }
 
-    public CryptoCurrencyAssetChecker(List<AssetSourceCredentials> credentialsList) {
-        super(null);
-        this.addressList.addAll(credentialsList.stream().map(c -> c.getType()).collect(Collectors.toList()));
-    }
-
-    public List<Account> retrieveAccounts() throws ApiException {
+    @Override
+    public List<Account> retrieveAccounts(List<AssetSourceCredentials> credentialList) throws ApiException {
+        for (AssetSourceCredentials credentials : credentialList) {
+            if (credentials != null && !addressList.contains(credentials.getUser())) {
+                addressList.add(credentials.getUser());
+            }
+        }
         BigDecimal exchangeRateToEur = getExchangeRate();
         return retrieveAccounts(exchangeRateToEur);
     }
@@ -73,6 +75,5 @@ public abstract class CryptoCurrencyAssetChecker extends AssetChecker {
     protected abstract BigDecimal getAddressBalance(String address) throws ApiException;
 
     protected abstract List<BigDecimal> getAddressListBalances(List<String> addressList) throws ApiException;
-
 
 }

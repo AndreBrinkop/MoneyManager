@@ -26,16 +26,13 @@ public class BitcoinDeAssetChecker extends HTTPAssetChecker {
 
     private String logoutCsrfToken = "";
 
-    public BitcoinDeAssetChecker(AssetSourceCredentials credentials) {
-        super(credentials);
-    }
     @Override
     public String getName() {
         return "Bitcoin.de";
     }
 
     @Override
-    protected void login() throws ApiException {
+    protected void login(AssetSourceCredentials credentials) throws ApiException {
         String bitcoinDeLoginUrl = "https://www.bitcoin.de/de/login";
         logoutCsrfToken = "";
 

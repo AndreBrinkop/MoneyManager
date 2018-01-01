@@ -1,7 +1,6 @@
 package model.asset_checker;
 
 import model.ApiException;
-import model.asset.AssetSourceCredentials;
 import model.asset_checker.abstract_checker.CryptoCurrencyAssetChecker;
 import org.apache.http.client.fluent.Content;
 import org.apache.http.client.fluent.Request;
@@ -17,19 +16,6 @@ import java.util.List;
 import static java.util.Arrays.asList;
 
 public class EthereumAssetChecker extends CryptoCurrencyAssetChecker {
-
-    public EthereumAssetChecker(AssetSourceCredentials credentials) {
-        super(credentials);
-    }
-
-    public EthereumAssetChecker(List<AssetSourceCredentials> credentialsList) {
-        super(credentialsList);
-    }
-
-    public EthereumAssetChecker(AssetSourceCredentials... credentialsObjects) {
-        super(Arrays.asList(credentialsObjects));
-    }
-
 
     @Override
     protected int getSmallestUnitExponent() {

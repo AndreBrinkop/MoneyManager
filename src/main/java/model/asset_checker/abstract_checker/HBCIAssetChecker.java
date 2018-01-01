@@ -29,15 +29,11 @@ import java.util.Properties;
 
 public abstract class HBCIAssetChecker extends AssetChecker {
 
-    public HBCIAssetChecker(AssetSourceCredentials credentials) {
-        super(credentials);
-    }
-
     public abstract String getName();
 
     public abstract HBCIAssetCheckerPassport fillPassport(HBCIAssetCheckerPassport passport);
 
-    private HBCIPassport createPassport() {
+    private HBCIPassport createPassport(AssetSourceCredentials credentials) {
         HBCIAssetCheckerPassport passport = new HBCIAssetCheckerPassport();
         passport = fillPassport(passport);
         passport.setHBCIVersion("300");
@@ -49,7 +45,8 @@ public abstract class HBCIAssetChecker extends AssetChecker {
         return passport;
     }
 
-    public List<Account> retrieveAccounts() throws ApiException {
+    @Override
+    public List<Account> retrieveAccounts(AssetSourceCredentials credentials) throws ApiException {
         List<Account> assetList = new LinkedList<>();
         HBCIPassport passport = null;
         HBCIHandler hbciHandle = null;
@@ -79,7 +76,7 @@ public abstract class HBCIAssetChecker extends AssetChecker {
                 }
             });
 
-            passport = createPassport();
+            passport = createPassport(credentials);
             //passport.clearBPD();
 
             String version = passport.getHBCIVersion();

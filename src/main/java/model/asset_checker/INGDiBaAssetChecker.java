@@ -1,13 +1,8 @@
 package model.asset_checker;
 
-import model.asset.AssetSourceCredentials;
 import model.asset_checker.abstract_checker.HBCIAssetChecker;
 
 public class INGDiBaAssetChecker extends HBCIAssetChecker {
-
-    public INGDiBaAssetChecker(AssetSourceCredentials credentials) {
-        super(credentials);
-    }
 
     @Override
     public String getName() {

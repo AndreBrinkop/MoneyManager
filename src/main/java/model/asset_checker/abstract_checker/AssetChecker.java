@@ -10,6 +10,7 @@ import org.apache.http.client.fluent.Executor;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.HttpClientBuilder;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,16 +18,18 @@ public abstract class AssetChecker {
 
     public abstract String getName();
 
-    protected final AssetSourceCredentials credentials;
+    public abstract List<Account> retrieveAccounts(AssetSourceCredentials credentials) throws ApiException;
 
-    public AssetChecker(AssetSourceCredentials credentials) {
-        this.credentials = credentials;
+    public List<Account> retrieveAccounts(List<AssetSourceCredentials> credentialList) throws ApiException {
+        List<Account> accounts = new LinkedList<>();
+        for (AssetSourceCredentials credentials : credentialList) {
+            accounts.addAll(retrieveAccounts(credentials));
+        }
+        return accounts;
     }
 
-    public abstract List<Account> retrieveAccounts() throws ApiException;
-
-    public List<Account> updateAssets(List<Account> accounts) throws ApiException {
-        List<Account> currentAccounts = retrieveAccounts();
+    public List<Account> updateAssets(AssetSourceCredentials credentials, List<Account> accounts) throws ApiException {
+        List<Account> currentAccounts = retrieveAccounts(credentials);
         for (Account currentAccount : currentAccounts) {
             int accountIndex = accounts.stream().map(account -> account.getName()).collect(Collectors.toList()).indexOf(currentAccount.getName());
             if (accountIndex > -1) {
@@ -58,27 +61,27 @@ public abstract class AssetChecker {
     public static AssetChecker createAssetChecker(AssetSourceCredentials assetSourceCredentials) {
         switch (new String(assetSourceCredentials.getType())) {
             case "SPARKASSE_HANNOVER":
-                return new SparkasseHannoverAssetChecker(assetSourceCredentials);
+                return new SparkasseHannoverAssetChecker();
             case "ING_DIBA":
-                return new INGDiBaAssetChecker(assetSourceCredentials);
+                return new INGDiBaAssetChecker();
             case "AUXMONEY":
-                return new AuxmoneyAssetChecker(assetSourceCredentials);
+                return new AuxmoneyAssetChecker();
             case "BITCOIN_DE":
-                return new BitcoinDeAssetChecker(assetSourceCredentials);
+                return new BitcoinDeAssetChecker();
             case "KRAKEN":
-                return new KrakenAssetChecker(assetSourceCredentials);
+                return new KrakenAssetChecker();
             case "COINBASE":
-                return new CoinbaseAssetChecker(assetSourceCredentials);
+                return new CoinbaseAssetChecker();
             case "PAYPAL":
-                return new PayPalAssetChecker(assetSourceCredentials);
+                return new PayPalAssetChecker();
             case "AMAZON_VISA":
-                return new AmazonVisaAssetChecker(assetSourceCredentials);
+                return new AmazonVisaAssetChecker();
             case "ETHEREUM":
-                return new EthereumAssetChecker(assetSourceCredentials);
+                return new EthereumAssetChecker();
             case "BITCOIN_CASH":
-                return new BitcoinCashAssetChecker(assetSourceCredentials);
+                return new BitcoinCashAssetChecker();
             case "EQUATE_PLUS":
-                return new EquatePlusAssetChecker(assetSourceCredentials);
+                return new EquatePlusAssetChecker();
         }
         return null;
     }

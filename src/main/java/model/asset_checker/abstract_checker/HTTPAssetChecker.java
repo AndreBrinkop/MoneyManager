@@ -12,21 +12,21 @@ public abstract class HTTPAssetChecker extends AssetChecker {
 
     protected Executor executor;
 
-    public HTTPAssetChecker(AssetSourceCredentials credentials) {
-        super(credentials);
+    public HTTPAssetChecker() {
         this.executor = getExecutor();
     }
 
     public abstract String getName();
 
-    protected abstract void login() throws ApiException;
+    protected abstract void login(AssetSourceCredentials credentials) throws ApiException;
 
     protected abstract void logout() throws ApiException;
 
     protected abstract List<Account> retrieveAssetsWithActiveSession() throws ApiException;
 
-    public List<Account> retrieveAccounts() throws ApiException {
-        login();
+    @Override
+    public List<Account> retrieveAccounts(AssetSourceCredentials credentials) throws ApiException {
+        login(credentials);
         List<Account> accounts = retrieveAssetsWithActiveSession();
         logout();
         return accounts;

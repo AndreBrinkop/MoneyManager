@@ -22,11 +22,6 @@ import java.util.Optional;
 
 public class AuxmoneyAssetChecker extends HTTPAssetChecker {
 
-
-    public AuxmoneyAssetChecker(AssetSourceCredentials credentials) {
-        super(credentials);
-    }
-
     @Override
     public String getName() {
         return "Auxmoney";
@@ -73,7 +68,7 @@ public class AuxmoneyAssetChecker extends HTTPAssetChecker {
         }
     }
 
-    protected void login() throws ApiException {
+    protected void login(AssetSourceCredentials credentials) throws ApiException {
         executor.clearCookies();
         String auxmoneyLoginUrl = "https://www.auxmoney.com/login";
         try {

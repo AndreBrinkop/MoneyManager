@@ -2,6 +2,7 @@ package model.asset;
 
 import model.ApiException;
 import model.asset.account.Account;
+import model.asset_checker.OfflineAssetChecker;
 import model.asset_checker.abstract_checker.AssetChecker;
 
 import java.math.BigDecimal;
@@ -15,10 +16,14 @@ public class AssetSource {
     private List<Account> accounts;
     private AssetChecker checker;
 
-    public AssetSource(AssetChecker checker) throws ApiException {
+    public AssetSource(AssetSourceCredentials credentials) {
+        this.checker = AssetChecker.createAssetChecker(credentials);
         this.name = checker.getName();
-        this.accounts = checker.retrieveAccounts();
-        this.checker = checker;
+    }
+
+    public AssetSource(OfflineAssetChecker offlineAssetChecker) {
+        this.checker = offlineAssetChecker;
+        this.name = checker.getName();
     }
 
     public List<Account> getAccounts() {
@@ -34,8 +39,12 @@ public class AssetSource {
         return this.accounts.stream().map(Account::getCurrentBalance).map(Balance::getEuroBalanceValue).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public void updateAssets() throws ApiException {
-        this.accounts = this.checker.updateAssets(this.accounts);
+    public void updateAssets(AssetSourceCredentials credentials) throws ApiException {
+        if (this.accounts == null) {
+            this.accounts = this.checker.retrieveAccounts(credentials);
+        } else {
+            this.accounts = this.checker.updateAssets(credentials, this.accounts);
+        }
     }
 
     public String getName() {
@@ -45,7 +54,9 @@ public class AssetSource {
     @Override
     public String toString() {
         StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append(name).append(": ").append(roundValue(getTotalEurValue())).append(" €\n");
+
+        BigDecimal totalEurValue = getTotalEurValue();
+        stringBuffer.append(name).append(": ").append(roundValue(totalEurValue)).append(" €\n");
         this.accounts.stream().forEach(account -> stringBuffer.append("\t").append(account.toString()).append("\n"));
         return stringBuffer.toString();
     }

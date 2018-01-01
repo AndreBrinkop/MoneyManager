@@ -24,17 +24,13 @@ public class AmazonVisaAssetChecker extends HTTPAssetChecker {
     private String sessionTicket;
     private String logoutUrl;
 
-    public AmazonVisaAssetChecker(AssetSourceCredentials credentials) {
-        super(credentials);
-    }
-
     @Override
     public String getName() {
         return "Amazon Visa Karte";
     }
 
     @Override
-    protected void login() throws ApiException {
+    protected void login(AssetSourceCredentials credentials) throws ApiException {
         String lbbLoginUrl = "https://kreditkarten-banking.lbb.de/Amazon/cas/";
         try {
             Response response = executor.execute(Request.Get(lbbLoginUrl + "dispatch.do?bt_PRELON=1&ref=1200_AMAZON&service=COS"));

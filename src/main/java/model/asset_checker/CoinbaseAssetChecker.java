@@ -28,8 +28,7 @@ public class CoinbaseAssetChecker extends AssetChecker {
 
     private Executor executor;
 
-    public CoinbaseAssetChecker(AssetSourceCredentials credentials) {
-        super(credentials);
+    public CoinbaseAssetChecker() {
         HttpClient client = HttpClients.custom()
                 .setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build()).build();
         executor = Executor.newInstance(client);
@@ -41,7 +40,7 @@ public class CoinbaseAssetChecker extends AssetChecker {
     }
 
     @Override
-    public List<Account> retrieveAccounts() throws ApiException {
+    public List<Account> retrieveAccounts(AssetSourceCredentials credentials) throws ApiException {
         try {
             // just the first 100 accounts are displayed; Pagination is not implemented yet
             String apiVersion = "2017-08-07";

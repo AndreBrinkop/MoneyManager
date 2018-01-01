@@ -18,18 +18,16 @@ public class KrakenAssetChecker extends AssetChecker {
 
     private KrakenApi api;
 
-    public KrakenAssetChecker(AssetSourceCredentials credentials) {
-        super(null);
-        this.api = new edu.self.kraken.api.KrakenApi();
-        this.api.setKey(credentials.getKey());
-        this.api.setSecret(credentials.getSecret());
-    }
-
     public String getName() {
         return "kraken.com";
     }
 
-    public List<Account> retrieveAccounts() throws ApiException {
+    @Override
+    public List<Account> retrieveAccounts(AssetSourceCredentials credentials) throws ApiException {
+        this.api = new edu.self.kraken.api.KrakenApi();
+        this.api.setKey(credentials.getKey());
+        this.api.setSecret(credentials.getSecret());
+
         Map<String, BigDecimal> assets = getAssetValues();
         Map<String, BigDecimal> conversionRates = getConversionRatesToEur(
                 assets.entrySet()
@@ -37,6 +35,9 @@ public class KrakenAssetChecker extends AssetChecker {
                         .map(Map.Entry::getKey)
                         .collect(Collectors.toSet())
         );
+
+        this.api.setKey(null);
+        this.api.setSecret(null);
         return createAssetObjects(assets, conversionRates);
     }
 
