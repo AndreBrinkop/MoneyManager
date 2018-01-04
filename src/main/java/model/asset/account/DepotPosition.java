@@ -2,6 +2,7 @@ package model.asset.account;
 
 import model.asset.DepotPositionBalance;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Comparator;
@@ -10,12 +11,21 @@ import java.util.List;
 
 import static util.NumberHelper.roundValue;
 
+@Entity
 public class DepotPosition {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long depotPositionId;
 
     private String name;
     private String isin;
     private String wkn;
+    @OneToMany(cascade = {CascadeType.ALL})
     private List<DepotPositionBalance> positionBalanceList = new LinkedList<>();
+
+    public DepotPosition() {
+    }
 
     public DepotPosition(String name, String isin, String wkn, BigDecimal amount, BigDecimal pricePerUnit, BigDecimal buyValue) {
         this.name = name;

@@ -1,12 +1,25 @@
 package model.asset;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
 public class AssetSourceCredentials {
 
-    private final char[] type;
-    private final char[] user;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long credentialsId;
 
-    private final char[] key;
-    private final char[] secret;
+    private char[] type;
+    private char[] user;
+
+    private char[] key;
+    private char[] secret;
+
+    public AssetSourceCredentials() {
+    }
 
     public AssetSourceCredentials(char[] type, char[] user, char[] key, char[] secret) {
         this.type = type;
@@ -27,6 +40,10 @@ public class AssetSourceCredentials {
         this.user = user;
         this.key = null;
         this.secret = null;
+    }
+
+    public long getCredentialsId() {
+        return credentialsId;
     }
 
     public String getType() {

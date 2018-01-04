@@ -2,13 +2,20 @@ package model.asset.account;
 
 import model.asset.Balance;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 import java.math.BigDecimal;
 
 import static util.NumberHelper.roundValue;
 
+@Entity
+@DiscriminatorValue("CurrencyAccount")
 public class CurrencyAccount extends Account {
 
     private String currency;
+
+    public CurrencyAccount() {
+    }
 
     public CurrencyAccount(String name, String currency, BigDecimal currencyValue, BigDecimal exchangeRateToEur) {
         super(name);

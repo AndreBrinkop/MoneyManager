@@ -58,7 +58,7 @@ public abstract class AssetChecker {
         return executor;
     }
 
-    public static AssetChecker createAssetChecker(AssetSourceCredentials assetSourceCredentials) {
+    public static AssetChecker getAssetChecker(AssetSourceCredentials assetSourceCredentials) {
         switch (new String(assetSourceCredentials.getType())) {
             case "SPARKASSE_HANNOVER":
                 return new SparkasseHannoverAssetChecker();

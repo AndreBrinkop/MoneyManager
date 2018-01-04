@@ -2,48 +2,64 @@ package model.asset;
 
 import model.ApiException;
 import model.asset.account.Account;
-import model.asset_checker.OfflineAssetChecker;
 import model.asset_checker.abstract_checker.AssetChecker;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.LinkedList;
 import java.util.List;
 
 import static util.NumberHelper.roundValue;
 
+@Entity
 public class AssetSource implements AssetObject {
 
-    private String name;
-    private List<Account> accounts;
-    private AssetChecker checker;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long assetSourceId;
 
-    public AssetSource(AssetSourceCredentials credentials) {
-        this.checker = AssetChecker.createAssetChecker(credentials);
-        this.name = checker.getName();
+    protected String name;
+    private Long credentialsId = null;
+
+    @OneToMany(cascade = {CascadeType.ALL})
+    protected List<Account> accounts;
+
+    public AssetSource() {
     }
 
-    public AssetSource(OfflineAssetChecker offlineAssetChecker) {
-        this.checker = offlineAssetChecker;
-        this.name = checker.getName();
+    public AssetSource(AssetSourceCredentials credentials) {
+        this.name = AssetChecker.getAssetChecker(credentials).getName();
+        this.credentialsId = credentials.getCredentialsId();
     }
 
     public List<Account> getAccounts() {
         return accounts;
     }
 
-    // TODO: Replace
-    public void removeAccount(Account account) {
-        this.accounts.remove(account);
+    public Balance getCurrentEurBalance() {
+        return getCurrentEurBalance(null);
     }
 
-    public Balance getCurrentEurBalance() {
-        return new Balance(this.accounts.stream().map(Account::getCurrentEurBalance).map(Balance::getEuroBalanceValue).reduce(BigDecimal.ZERO, BigDecimal::add));
+    @Override
+    public Balance getCurrentEurBalance(List<String> ignoredAccountNames) {
+        if (ignoredAccountNames == null) {
+            ignoredAccountNames = new LinkedList<>();
+        }
+        List<String> finalIgnoredAccountNames = ignoredAccountNames;
+        return new Balance(this.accounts
+                .stream()
+                .filter(account -> !finalIgnoredAccountNames.contains(account.getName()))
+                .map(Account::getCurrentEurBalance)
+                .map(Balance::getEuroBalanceValue)
+                .reduce(BigDecimal.ZERO, BigDecimal::add));
     }
 
     public void updateAssets(AssetSourceCredentials credentials) throws ApiException {
+        AssetChecker checker = AssetChecker.getAssetChecker(credentials);
         if (this.accounts == null) {
-            this.accounts = this.checker.retrieveAccounts(credentials);
+            this.accounts = checker.retrieveAccounts(credentials);
         } else {
-            this.accounts = this.checker.updateAssets(credentials, this.accounts);
+            this.accounts = checker.updateAssets(credentials, this.accounts);
         }
     }
 
@@ -51,13 +67,28 @@ public class AssetSource implements AssetObject {
         return name;
     }
 
+    public Long getCredentialsId() {
+        return credentialsId;
+    }
+
     @Override
     public String toString() {
+        return toString(null);
+    }
+
+    public String toString(List<String> ignoredAccountNames) {
+        if (ignoredAccountNames == null) {
+            ignoredAccountNames = new LinkedList<>();
+        }
         StringBuffer stringBuffer = new StringBuffer();
 
         BigDecimal totalEurValue = getCurrentEurBalance().getEuroBalanceValue();
         stringBuffer.append(name).append(": ").append(roundValue(totalEurValue)).append(" €\n");
-        this.accounts.stream().forEach(account -> stringBuffer.append("\t").append(account.toString()).append("\n"));
+        List<String> finalIgnoredAccountNames = ignoredAccountNames;
+        this.accounts
+                .stream()
+                .filter(account -> !finalIgnoredAccountNames.contains(account.getName()))
+                .forEach(account -> stringBuffer.append("\t").append(account.toString()).append("\n"));
         return stringBuffer.toString();
     }
 }

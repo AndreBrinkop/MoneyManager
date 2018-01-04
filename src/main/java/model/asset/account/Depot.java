@@ -3,6 +3,10 @@ package model.asset.account;
 import model.asset.Balance;
 import util.NumberHelper;
 
+import javax.persistence.CascadeType;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.List;
@@ -10,9 +14,15 @@ import java.util.stream.Collectors;
 
 import static util.NumberHelper.roundValue;
 
+@Entity
+@DiscriminatorValue("Depot")
 public class Depot extends Account {
 
+    @OneToMany(cascade = {CascadeType.ALL})
     private List<DepotPosition> depotPositions;
+
+    public Depot() {
+    }
 
     public Depot(String name, List<DepotPosition> depotPositions) {
         super(name);

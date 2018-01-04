@@ -1,39 +1,52 @@
 package model.asset;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.math.BigDecimal;
 import java.util.Date;
 
+@Entity
 public class DepotPositionBalance {
 
-    private BigDecimal amount;
-    private BigDecimal pricePerUnit;
-    private BigDecimal buyValue;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long depotPositionBalanceId;
+
+    private String amountString;
+    private String pricePerUnitString;
+    private String buyValueString;
     private Date timestamp;
 
+    public DepotPositionBalance() {
+    }
+
     public DepotPositionBalance(BigDecimal amount, BigDecimal pricePerUnit, BigDecimal buyValue) {
-        this.amount = amount;
-        this.pricePerUnit = pricePerUnit;
-        this.buyValue = buyValue;
+        this.amountString = amount.toString();
+        this.pricePerUnitString = pricePerUnit.toString();
+        this.buyValueString = buyValue.toString();
         this.timestamp = new Date();
     }
 
     public DepotPositionBalance(BigDecimal amount, BigDecimal pricePerUnit) {
-        this.amount = amount;
-        this.pricePerUnit = pricePerUnit;
-        this.buyValue = null;
+        this.amountString = amount.toString();
+        this.pricePerUnitString = pricePerUnit.toString();
+        this.buyValueString = null;
         this.timestamp = new Date();
     }
 
     public BigDecimal getAmount() {
-        return amount;
+        return amountString == null ? null : new BigDecimal(amountString);
+
     }
 
     public BigDecimal getPricePerUnit() {
-        return pricePerUnit;
+        return pricePerUnitString == null ? null : new BigDecimal(pricePerUnitString);
     }
 
     public BigDecimal getBuyValue() {
-        return buyValue;
+        return buyValueString == null ? null : new BigDecimal(buyValueString);
     }
 
     public Date getTimestamp() {

@@ -1,10 +1,10 @@
 package gui;
 
-import database.DatabaseConnection;
 import model.ApiException;
 import model.asset.AssetSource;
 import model.asset.AssetSourceCredentials;
-import model.asset.account.Account;
+import model.asset.account.BasicAccount;
+import model.asset.account.OfflineAssetSource;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,18 +12,34 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import static java.util.Arrays.asList;
 import static util.NumberHelper.roundValue;
+import static util.PersistenceHelper.*;
 
 public class MoneyManager {
 
     public static void main(String[] args) throws Exception {
-        DatabaseConnection databaseConnection = new DatabaseConnection(getEncryptionKeyFromConsoleInput());
-        List<AssetSourceCredentials> credentials = databaseConnection.getAssetSourceCredentials();
-        AssetSource offlineAccounts = databaseConnection.getOfflineAccountAssetSource();
+        String encryptionKey = getEncryptionKeyFromConsoleInput();
+        List<AssetSource> assetSources = loadObjects(encryptionKey, AssetSource.class);
 
         MoneyManager moneyManager = new MoneyManager();
-        List<AssetSource> assetSources = moneyManager.retrieveAssets(credentials, offlineAccounts);
+
+        // TODO: Improve handling and initialization of online and offline accounts
+        if (assetSources == null || assetSources.isEmpty()) {
+            List<AssetSourceCredentials> credentials = loadObjects(encryptionKey, AssetSourceCredentials.class);
+            assetSources = moneyManager.retrieveAssets(credentials, null);
+
+            if (!assetSources.isEmpty()) {
+                AssetSource offlineAssetSource = new OfflineAssetSource(new BasicAccount("Tesla Model 3 Reservation", new BigDecimal(1000.0)));
+                offlineAssetSource.updateAssets(null);
+                assetSources.add(offlineAssetSource);
+                printAssets(assetSources);
+                assetSources = assetSources.stream().map(assetSource -> saveObject(encryptionKey, assetSource)).collect(Collectors.toList());
+            }
+        }
+
         System.out.println();
 
         printAssets(assetSources);
@@ -37,7 +53,7 @@ public class MoneyManager {
             while (!done) {
                 System.out.println("Update assets from: " + assetSource.getName());
                 try {
-                    assetSource.updateAssets(credentials.size() > i ? credentials.get(i) : null);
+                    assetSource.updateAssets(loadAssetSourceCredentials(encryptionKey, assetSource.getCredentialsId()));
                     done = true;
                 } catch (ApiException e) {
                     e.printStackTrace();
@@ -46,21 +62,19 @@ public class MoneyManager {
         }
         System.out.println();
 
-        printAssets(assetSources);
+        assetSources = assetSources.stream().map(assetSource -> saveObject(encryptionKey, assetSource)).collect(Collectors.toList());
 
-        System.out.println();
+        printAssets(assetSources);
     }
 
     private static void printAssets(List<AssetSource> assetSources) {
-        // TODO:
-        filterOutAssetSources(assetSources, "KlassikSparen");
-        filterOutAssetSources(assetSources, "BonusSparen");
-
+        // TODO: Remove
+        List<String> ignoredAccountNames = asList("BonusSparen 4900776955", "KlassikSparen 3901133380");
         for (AssetSource assetSource : assetSources) {
-            System.out.println(assetSource);
+            System.out.println(assetSource.toString(ignoredAccountNames));
         }
 
-        BigDecimal totalAmount = roundValue(assetSources.stream().map(assetSource -> assetSource.getCurrentEurBalance().getEuroBalanceValue()).reduce(BigDecimal.ZERO, BigDecimal::add));
+        BigDecimal totalAmount = roundValue(assetSources.stream().map(assetSource -> assetSource.getCurrentEurBalance(ignoredAccountNames).getEuroBalanceValue()).reduce(BigDecimal.ZERO, BigDecimal::add));
         System.out.println("--------------------");
         //System.out.println("Old Total: " + oldTotalAmount + " €");
         System.out.println("Total: " + totalAmount + " €");
@@ -79,7 +93,7 @@ public class MoneyManager {
         return encryptionKey;
     }
 
-    public static List<AssetSource> retrieveAssets(List<AssetSourceCredentials> credentialsList, AssetSource offlineAccounts) throws IOException {
+    public static List<AssetSource> retrieveAssets(List<AssetSourceCredentials> credentialsList, AssetSource offlineAccounts) {
         List<AssetSource> assetSourceList = new LinkedList<>();
 
         for (int i = 0; i < credentialsList.size(); i++) {
@@ -97,26 +111,16 @@ public class MoneyManager {
                 }
             }
         }
-        try {
-            offlineAccounts.updateAssets(null);
-        } catch (ApiException e) {
-            e.printStackTrace();
+        if (offlineAccounts != null) {
+            try {
+                offlineAccounts.updateAssets(null);
+            } catch (ApiException e) {
+                e.printStackTrace();
+            }
+            assetSourceList.add(offlineAccounts);
         }
-        assetSourceList.add(offlineAccounts);
-        return assetSourceList;
-    }
 
-    private static void filterOutAssetSources(List<AssetSource> assetSourceList, String accountNamePart) {
-        for (AssetSource assetSource : assetSourceList) {
-            if (assetSource == null || assetSource.getAccounts() == null) {
-                continue;
-            }
-            for (Account account : assetSource.getAccounts()) {
-                if (account.getName().contains(accountNamePart)) {
-                    assetSource.removeAccount(account);
-                }
-            }
-        }
+        return assetSourceList;
     }
 
 }

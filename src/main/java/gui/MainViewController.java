@@ -1,6 +1,5 @@
 package gui;
 
-import database.DatabaseConnection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -17,18 +16,18 @@ import model.asset.account.Account;
 
 import javax.security.auth.login.CredentialException;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 
 import static util.NumberHelper.roundValue;
+import static util.PersistenceHelper.loadObjects;
 
 public class MainViewController {
 
     public MainViewController(String encryptionKey) throws CredentialException, IOException {
-        this.databaseConnection = new DatabaseConnection(encryptionKey);
+        this.encryptionKey = encryptionKey.toCharArray();
     }
 
-    private DatabaseConnection databaseConnection;
+    private char[] encryptionKey;
     private ObservableList<AssetSource> assetSourcesList;
 
     @FXML
@@ -36,15 +35,9 @@ public class MainViewController {
 
     @FXML
     public void initialize() {
-        try {
-            List<AssetSourceCredentials> credentials = databaseConnection.getAssetSourceCredentials();
-            AssetSource offlineAccounts = databaseConnection.getOfflineAccountAssetSource();
-            this.assetSourcesList = FXCollections.observableList(MoneyManager.retrieveAssets(credentials, offlineAccounts));
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        List<AssetSourceCredentials> credentials = loadObjects(new String(encryptionKey), AssetSourceCredentials.class);
+        List<AssetSource> assetSources = loadObjects(new String(encryptionKey), AssetSource.class);
+        this.assetSourcesList = FXCollections.observableList(assetSources);
 
         TreeItem<AssetObject> rootNode = new TreeItem<>(null);
         for (AssetSource assetSource : assetSourcesList) {
